@@ -14,7 +14,8 @@ public class PlayerController : MonoBehaviour
     
     private bool groundedPlayer;
 
-    private float playerSpeed = 11.0f;
+    public float playerSpeed = 11.0f;
+    public float playerSpeedStatic;
     private float jumpHeight = 1.0f;
     private float gravityValue = -9.81f;
 
@@ -29,9 +30,13 @@ public class PlayerController : MonoBehaviour
     public GameObject cannon;
     public GameObject bullet;
 
+    public AudioSource audioSource;
+
+    public Vector3 lastPos;
 
     private void Start()
     {
+        //Get components for controller
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
@@ -41,7 +46,14 @@ public class PlayerController : MonoBehaviour
         jumpAction = playerInput.actions["Jump"];
         shootAction = playerInput.actions["Shoot"];
 
+        //Locks cursor to center of screen for easier third person camera controls
         Cursor.lockState = CursorLockMode.Locked;
+
+        audioSource = GetComponent<AudioSource>();
+
+        //Used for speed calculation
+        playerSpeedStatic = playerSpeed;
+        lastPos = transform.position;
     }
 
     void Update()
@@ -83,6 +95,31 @@ public class PlayerController : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
+        }
+
+        //Get Audio Mixer
+        var pitchBendGroup = Resources.Load<UnityEngine.Audio.AudioMixerGroup>("MyAudioMixer"); 
+        audioSource.outputAudioMixerGroup = pitchBendGroup;
+
+        //Calculate player speed
+        float speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
+        lastPos = transform.position;
+
+        //Normalize speed 
+        float newPitch = speed/playerSpeedStatic;
+
+        //Add pitch modifier
+        audioSource.pitch = newPitch; 
+        pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
+
+        //Debug tools
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            playerSpeed -= 1.0f;
+        }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            playerSpeed += 1.0f;
         }
     }
 
