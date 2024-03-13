@@ -3271,7 +3271,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerIndex: -1
   AutoEnableInputs: 1
-  XYAxis: {fileID: -9215274633268145457, guid: 823723bed53a87b4cb9d150552cb9252, type: 3}
+  XYAxis: {fileID: 2183797307485613239, guid: c5f0d4bf37db32c4db24296636d73c7f, type: 3}
   ZAxis: {fileID: 0}
 --- !u!1001 &1182096970
 PrefabInstance:
@@ -4432,6 +4432,7 @@ GameObject:
   - component: {fileID: 1615118090}
   - component: {fileID: 1615118089}
   - component: {fileID: 1615118088}
+  - component: {fileID: 1615118095}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -4468,13 +4469,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camera: {fileID: 963194227}
-<<<<<<< Updated upstream
-  shootingEnabled: 1
-  cannon: {fileID: 1888639285}
-  bullet: {fileID: 6208256262527014329, guid: 2655a88073fa11c45a68920df5933d9a, type: 3}
-=======
-  playerSpeed: 11
-  playerSpeedStatic: 0
   hitEnabled: 1
   accuracyManager: {fileID: 1378279867}
   passedHits: 0
@@ -4482,11 +4476,10 @@ MonoBehaviour:
   bullet: {fileID: 6208256262527014329, guid: 2655a88073fa11c45a68920df5933d9a, type: 3}
   audioSource: {fileID: 0}
   lowChannel: {fileID: 8300000, guid: b1b897567a1d96e4abae608367fb6b44, type: 3}
-  midChannel: {fileID: 8300000, guid: 7e29f89286ba02e4bbd099a7f2cb1dd0, type: 3}
+  midChannel: {fileID: 8300000, guid: 52e63ffd192997b4aa3ada0f7dbf3ee7, type: 3}
   highChannel: {fileID: 8300000, guid: 64132b39f423045458f1d6655ecd5e8b, type: 3}
   lastPos: {x: 0, y: 0, z: 0}
   speedText: {fileID: 1431224626}
->>>>>>> Stashed changes
 --- !u!114 &1615118089
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4499,7 +4492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Actions: {fileID: -944628639613478452, guid: 823723bed53a87b4cb9d150552cb9252, type: 3}
+  m_Actions: {fileID: -944628639613478452, guid: c5f0d4bf37db32c4db24296636d73c7f, type: 3}
   m_NotificationBehavior: 0
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
@@ -4514,7 +4507,7 @@ MonoBehaviour:
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: Controller
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 963194227}
 --- !u!143 &1615118090
@@ -4643,8 +4636,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1615118086}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
-<<<<<<< Updated upstream
-=======
 --- !u!82 &1615118095
 AudioSource:
   m_ObjectHideFlags: 0
@@ -5585,7 +5576,6 @@ PrefabInstance:
       addedObject: {fileID: 1504939629}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb196e6d1fe12e24aaf3e579358cc02f, type: 3}
->>>>>>> Stashed changes
 --- !u!1 &1888639285
 GameObject:
   m_ObjectHideFlags: 0

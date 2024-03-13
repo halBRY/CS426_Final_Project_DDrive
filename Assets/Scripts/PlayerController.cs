@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     private bool groundedPlayer;
 
     private float playerSpeed = 11.0f;
+    private float playerSpeedStatic;
     private float jumpHeight = 1.0f;
     private float gravityValue = -9.81f;
 
@@ -36,8 +37,6 @@ public class PlayerController : MonoBehaviour
     public GameObject cannon;
     public GameObject bullet;
 
-<<<<<<< Updated upstream
-=======
     public AudioSource audioSource;
 
     public AudioClip lowChannel;
@@ -45,7 +44,6 @@ public class PlayerController : MonoBehaviour
     public AudioClip highChannel;
 
     public Vector3 lastPos;
->>>>>>> Stashed changes
 
     public TMP_Text speedText;
     private float speedMod;
@@ -64,8 +62,6 @@ public class PlayerController : MonoBehaviour
         hitAction = playerInput.actions["Hit"];
 
         Cursor.lockState = CursorLockMode.Locked;
-<<<<<<< Updated upstream
-=======
 
         audioSource = GetComponent<AudioSource>();
 
@@ -74,7 +70,6 @@ public class PlayerController : MonoBehaviour
         lastPos = transform.position;
 
         speedMod = 1f;
->>>>>>> Stashed changes
     }
 
     void Update()
@@ -117,8 +112,6 @@ public class PlayerController : MonoBehaviour
         {
             Application.Quit();
         }
-<<<<<<< Updated upstream
-=======
 
         //Get Audio Mixer
         var pitchBendGroup = Resources.Load<UnityEngine.Audio.AudioMixerGroup>("MyAudioMixer"); 
@@ -148,7 +141,6 @@ public class PlayerController : MonoBehaviour
         pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
 
         speedText.text = myScore.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
->>>>>>> Stashed changes
     }
 
     public bool getAttemptHit()
