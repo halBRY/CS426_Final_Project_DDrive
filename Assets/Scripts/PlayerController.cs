@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+using UnityEngine.UI;
+
 
 public class PlayerController : MonoBehaviour
 {   
@@ -20,32 +23,64 @@ public class PlayerController : MonoBehaviour
 
     private InputAction moveAction;
     private InputAction jumpAction;
-    private InputAction shootAction;
+    private InputAction hitAction;
+
+    private bool attemptHit; // For the note to know the hit button was pressed
+    public bool hitEnabled = true;
+
+    public AccuracyManager accuracyManager;
+    public float passedHits = 0f;
 
     private Transform cameraTransform;
-
-    public bool shootingEnabled = true;
 
     public GameObject cannon;
     public GameObject bullet;
 
+<<<<<<< Updated upstream
+=======
+    public AudioSource audioSource;
+
+    public AudioClip lowChannel;
+    public AudioClip midChannel;
+    public AudioClip highChannel;
+
+    public Vector3 lastPos;
+>>>>>>> Stashed changes
+
+    public TMP_Text speedText;
+    private float speedMod;
 
     private void Start()
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
+        attemptHit = false;
+
         cameraTransform = camera.transform;
 
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
-        shootAction = playerInput.actions["Shoot"];
+        hitAction = playerInput.actions["Hit"];
 
         Cursor.lockState = CursorLockMode.Locked;
+<<<<<<< Updated upstream
+=======
+
+        audioSource = GetComponent<AudioSource>();
+
+        //Used for speed calculation
+        playerSpeedStatic = playerSpeed;
+        lastPos = transform.position;
+
+        speedMod = 1f;
+>>>>>>> Stashed changes
     }
 
     void Update()
     {
+        attemptHit = false;
+
         groundedPlayer = controller.isGrounded;
         if (groundedPlayer && playerVelocity.y < 0)
         {
@@ -73,25 +108,80 @@ public class PlayerController : MonoBehaviour
         Quaternion playerRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
         transform.rotation = Quaternion.Slerp(transform.rotation, playerRotation, 5f * Time.deltaTime);
 
-        if(shootAction.triggered && shootingEnabled == true)
+        if(hitAction.triggered && hitEnabled == true)
         {
-            GameObject newBullet = GameObject.Instantiate(bullet, cannon.transform.position, cannon.transform.rotation) as GameObject;
-            newBullet.GetComponent<Rigidbody>().velocity += Vector3.up * 2;
-            newBullet.GetComponent<Rigidbody>().AddForce(newBullet.transform.forward * 1500);
+            attemptHit = true;
         }
 
         if(Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }
+<<<<<<< Updated upstream
+=======
+
+        //Get Audio Mixer
+        var pitchBendGroup = Resources.Load<UnityEngine.Audio.AudioMixerGroup>("MyAudioMixer"); 
+        audioSource.outputAudioMixerGroup = pitchBendGroup;
+
+        float myScore = accuracyManager.score;
+        float accuracy = myScore/passedHits;
+
+        if(accuracy < .5)
+        {
+            playerSpeed = playerSpeedStatic * 0.75f;
+        }
+        else
+        {
+            playerSpeed = playerSpeedStatic;
+        }
+
+        //Calculate player speed
+        float speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
+        lastPos = transform.position;
+
+        //Normalize speed 
+        float newPitch = speed/playerSpeedStatic;
+
+        //Add pitch modifier
+        audioSource.pitch = newPitch; 
+        pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
+
+        speedText.text = myScore.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
+>>>>>>> Stashed changes
     }
 
-
-    void OnCollisionEnter(Collision collision)
+    public bool getAttemptHit()
     {
-        GameObject hitObject = collision.gameObject;
+        return attemptHit;
+    }
+
+    public void addHit()
+    {
+        passedHits += 1;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+
+        if(other.gameObject.tag == "High")
+        {
+            audioSource.clip = highChannel;
+            audioSource.Play();
+        }
+        else if(other.gameObject.tag == "Mid")
+        {
+            audioSource.clip = midChannel;
+            audioSource.Play();
+        }
+        else if(other.gameObject.tag == "Low")
+        {
+            audioSource.clip = lowChannel;
+            audioSource.Play();
+        }
 
         //Debug.Log("Collision Detected");
-        //Debug.Log(hitObject.tag);
+        //Debug.Log(other.gameObject.tag);
     }
+
 }
