@@ -9,6 +9,7 @@ public class HitNote : MonoBehaviour
 
     private bool canHit = false;
     private bool checkingForHits = true;
+    private bool missedNote = false;
 
     // Each fram checks if player is in trigger, if so check player is pressing hit button
     void Update()
@@ -17,15 +18,14 @@ public class HitNote : MonoBehaviour
         {
             if(player.getAttemptHit())
             {
-                Debug.Log("hit");
-                accuracyManager.AccuracyInc();
-                Destroy(gameObject);
-                canHit = false;
-            }
-
-            if(checkingForHits)
-            {
-                player.addHit();
+                if(gameObject.tag == "HitCenter")
+                {
+                    Debug.Log("hit perfect");
+                    accuracyManager.Perfect();
+                    Destroy(transform.parent.gameObject);
+                    player.addHit();
+                    canHit = false;
+                }
             }
             checkingForHits = false;
         }
@@ -42,7 +42,15 @@ public class HitNote : MonoBehaviour
 
     void OnTriggerExit(Collider collider)
     {
-        canHit = false;
+        if(!missedNote)
+        {
+            missedNote = true;
+            Destroy(transform.parent.gameObject);
+            Debug.Log("missed note");
+            canHit = false;
+            accuracyManager.ResetCombo();
+            player.MissedHit();
+        }
     }
     
 

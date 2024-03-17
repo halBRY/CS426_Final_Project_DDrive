@@ -8,6 +8,10 @@ TagManager:
   - Mid
   - Low
   - Hit
+  - Undefined
+  - HitLate
+  - HitCenter
+  - HitEarly
   layers:
   - Default
   - TransparentFX
