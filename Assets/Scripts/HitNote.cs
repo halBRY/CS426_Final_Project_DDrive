@@ -18,10 +18,27 @@ public class HitNote : MonoBehaviour
         {
             if(player.getAttemptHit())
             {
+                // Supposed to add early and late hits. But was buggy so only the center one exist
                 if(gameObject.tag == "HitCenter")
                 {
                     Debug.Log("hit perfect");
                     accuracyManager.Perfect();
+                    Destroy(transform.parent.gameObject);
+                    player.addHit();
+                    canHit = false;
+                }
+                else if(gameObject.tag == "HitEarly")
+                {
+                    Debug.Log("hit early");
+                    accuracyManager.Early();
+                    Destroy(transform.parent.gameObject);
+                    player.addHit();
+                    canHit = false;
+                }
+                else if(gameObject.tag == "HitLate")
+                {
+                    Debug.Log("hit late");
+                    accuracyManager.Late();
                     Destroy(transform.parent.gameObject);
                     player.addHit();
                     canHit = false;
@@ -37,12 +54,40 @@ public class HitNote : MonoBehaviour
 
     void OnTriggerEnter (Collider collider)
     {
-        canHit = true;
+                    if(player.getAttemptHit())
+            {
+                // Supposed to add early and late hits. But was buggy so only the center one exist
+                if(gameObject.tag == "HitCenter")
+                {
+                    Debug.Log("hit perfect");
+                    accuracyManager.Perfect();
+                    Destroy(transform.parent.gameObject);
+                    player.addHit();
+                    canHit = false;
+                }
+                else if(gameObject.tag == "HitEarly")
+                {
+                    Debug.Log("hit early");
+                    accuracyManager.Early();
+                    Destroy(transform.parent.gameObject);
+                    player.addHit();
+                    canHit = false;
+                }
+                else if(gameObject.tag == "HitLate")
+                {
+                    Debug.Log("hit late");
+                    accuracyManager.Late();
+                    Destroy(transform.parent.gameObject);
+                    player.addHit();
+                    canHit = false;
+                }
+            }
     }
 
     void OnTriggerExit(Collider collider)
     {
-        if(!missedNote)
+        // In if to prevent a note being counted twice if missed
+        if(!missedNote && gameObject.tag == "HitLate")
         {
             missedNote = true;
             Destroy(transform.parent.gameObject);
