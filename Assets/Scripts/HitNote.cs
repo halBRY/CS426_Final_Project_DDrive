@@ -54,34 +54,7 @@ public class HitNote : MonoBehaviour
 
     void OnTriggerEnter (Collider collider)
     {
-                    if(player.getAttemptHit())
-            {
-                // Supposed to add early and late hits. But was buggy so only the center one exist
-                if(gameObject.tag == "HitCenter")
-                {
-                    Debug.Log("hit perfect");
-                    accuracyManager.Perfect();
-                    Destroy(transform.parent.gameObject);
-                    player.addHit();
-                    canHit = false;
-                }
-                else if(gameObject.tag == "HitEarly")
-                {
-                    Debug.Log("hit early");
-                    accuracyManager.Early();
-                    Destroy(transform.parent.gameObject);
-                    player.addHit();
-                    canHit = false;
-                }
-                else if(gameObject.tag == "HitLate")
-                {
-                    Debug.Log("hit late");
-                    accuracyManager.Late();
-                    Destroy(transform.parent.gameObject);
-                    player.addHit();
-                    canHit = false;
-                }
-            }
+        canHit = true;
     }
 
     void OnTriggerExit(Collider collider)
