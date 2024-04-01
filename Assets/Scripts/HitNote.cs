@@ -55,6 +55,7 @@ public class HitNote : MonoBehaviour
     void OnTriggerEnter (Collider collider)
     {
         canHit = true;
+        Debug.Log("can hit");
     }
 
     void OnTriggerExit(Collider collider)
@@ -68,6 +69,12 @@ public class HitNote : MonoBehaviour
             canHit = false;
             accuracyManager.ResetCombo();
             player.MissedHit();
+        }
+        else
+        {
+            canHit = false;
+            Debug.Log("can not hit");
+
         }
     }
     
