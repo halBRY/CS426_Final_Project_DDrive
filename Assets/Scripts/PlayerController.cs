@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {   
     public Camera camera;
-
     private CharacterController controller;
     private PlayerInput playerInput;
     

@@ -48,4 +48,9 @@ public class AccuracyManager : MonoBehaviour
         comboText.text = "x" + combo.ToString();
     }
 
+    public uint getScore()
+    {
+        return score;
+    }
+
 }

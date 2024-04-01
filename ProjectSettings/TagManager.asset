@@ -12,6 +12,9 @@ TagManager:
   - HitLate
   - HitCenter
   - HitEarly
+  - HoldEnd
+  - HoldCenter
+  - HoldStart
   layers:
   - Default
   - TransparentFX
