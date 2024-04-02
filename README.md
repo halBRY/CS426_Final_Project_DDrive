@@ -28,7 +28,7 @@ Different colored "roads" will play different songs, in preparation for the diff
 
 Physics Constructs
 * Hit Note. When the player presses the hit key they will get a score multiplied by their combo
-* Hold Note. The same as hit note except the player has to hold the hit key till the end to get max points
+* Hold Note. The same as the hit note except the player has to hold the hit key till the end to get max points
 * Both Note types use more than one trigger but Hold notes can use many smaller parts to increase the length of the hold
 
 Lights
@@ -37,21 +37,22 @@ Lights
 * Headlights on the car
 
 Textures
-* Notes have a PCB like texture. Provied by Free PBR
+* Notes have a PCB like texture. Provide by Free PBR
 * Tracks
 * The Car. Provided by TurboSquid
 
 Puzzle And Navigation:
 * Players try to get the highest score they can by not missing the notes
 * Both note types are a type of trap
-* AI racers use Aggrotables, path finding and a way for AI to hit notes
+* AI racers use Aggrotables, pathfinding a way for AI to hit notes
 
 Mecanim
 * Idle animation of car spinning tires
 * Car spins when pressing a button
+* Turning turns the car
 
 How it comes all together:
-* The car will work together with the hitnotes to make a ryhtem game where the players tries to get 
-  the higest score they can with the best accurice. Using PCB textures will help make the game feel
+* The car will work together with the hit notes to make a rhythm game where the players try to get 
+  the highest score they can with the best accuracy. Using PCB textures will help make the game feel
   more "in a computer". AI racers will act like other rouge programs that want all the data to themselves.
   
