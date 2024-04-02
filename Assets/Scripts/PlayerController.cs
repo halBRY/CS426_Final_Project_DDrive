@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     
     private bool groundedPlayer;
 
-    private float playerSpeed = 11.0f;
+    private float playerSpeed = 20.0f;
     private float playerSpeedStatic;
     private float jumpHeight = 1.0f;
     private float gravityValue = -9.81f;
@@ -137,6 +137,11 @@ public class PlayerController : MonoBehaviour
         float newPitch = speed/playerSpeedStatic;
 
         //Add pitch modifier
+        if(newPitch > .9)
+        {
+            newPitch = 1f;
+        }
+
         audioSource.pitch = newPitch; 
         pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
 
