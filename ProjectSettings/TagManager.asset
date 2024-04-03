@@ -8,13 +8,13 @@ TagManager:
   - Mid
   - Low
   - Hit
-  - Undefined
-  - HitLate
-  - HitCenter
-  - HitEarly
-  - HoldEnd
-  - HoldCenter
   - HoldStart
+  - HoldCenter
+  - HoldEnd
+  - HitEarly
+  - HitCenter
+  - HitLate
+  - Virus
   layers:
   - Default
   - TransparentFX
@@ -22,8 +22,8 @@ TagManager:
   - 
   - Water
   - UI
-  - outofbounds
-  - notes
+  - 
+  - 
   - 
   - 
   - 

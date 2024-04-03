@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 lastPos;
 
+    public int myID = 0;
 
     public TMP_Text speedText;
     private float speedMod;
@@ -169,6 +170,16 @@ public class PlayerController : MonoBehaviour
     {
         passedHits += 1;
         accuracy = accuracyManager.hits/passedHits;
+    }
+
+    public float getAccuracy()
+    {
+        return accuracy;
+    }
+
+    public int getID()
+    {
+        return myID;
     }
 
     void OnTriggerEnter(Collider other)
