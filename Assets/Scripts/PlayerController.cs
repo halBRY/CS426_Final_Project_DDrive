@@ -9,7 +9,6 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {   
     public Camera camera;
-
     private CharacterController controller;
     private PlayerInput playerInput;
     
@@ -21,6 +20,8 @@ public class PlayerController : MonoBehaviour
     private float playerSpeedStatic;
     private float jumpHeight = 1.0f;
     private float gravityValue = -9.81f;
+
+    private float accuracy;
 
     private InputAction moveAction;
     private InputAction jumpAction;
@@ -37,6 +38,7 @@ public class PlayerController : MonoBehaviour
     public GameObject cannon;
     public GameObject bullet;
 
+
     public AudioSource audioSource;
 
     public AudioClip lowChannel;
@@ -44,6 +46,8 @@ public class PlayerController : MonoBehaviour
     public AudioClip highChannel;
 
     public Vector3 lastPos;
+
+    public int myID = 0;
 
     public TMP_Text speedText;
     private float speedMod;
@@ -63,13 +67,18 @@ public class PlayerController : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.Locked;
 
+
         audioSource = GetComponent<AudioSource>();
 
         //Used for speed calculation
         playerSpeedStatic = playerSpeed;
         lastPos = transform.position;
+        
+        accuracy = 1;
 
         speedMod = 1f;
+    
+
     }
 
     void Update()
@@ -117,9 +126,6 @@ public class PlayerController : MonoBehaviour
         var pitchBendGroup = Resources.Load<UnityEngine.Audio.AudioMixerGroup>("MyAudioMixer"); 
         audioSource.outputAudioMixerGroup = pitchBendGroup;
 
-        float myScore = accuracyManager.score;
-        float accuracy = myScore/passedHits;
-
         if(accuracy < .5)
         {
             playerSpeed = playerSpeedStatic * 0.75f;
@@ -145,7 +151,8 @@ public class PlayerController : MonoBehaviour
         audioSource.pitch = newPitch; 
         pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
 
-        speedText.text = myScore.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
+        //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
+        speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
     }
 
     public bool getAttemptHit()
@@ -155,7 +162,24 @@ public class PlayerController : MonoBehaviour
 
     public void addHit()
     {
+        accuracyManager.hits += 1;
         passedHits += 1;
+        accuracy = accuracyManager.hits/passedHits;
+    }
+    public void MissedHit()
+    {
+        passedHits += 1;
+        accuracy = accuracyManager.hits/passedHits;
+    }
+
+    public float getAccuracy()
+    {
+        return accuracy;
+    }
+
+    public int getID()
+    {
+        return myID;
     }
 
     void OnTriggerEnter(Collider other)
