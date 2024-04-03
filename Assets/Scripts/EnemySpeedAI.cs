@@ -42,8 +42,8 @@ public class EnemySpeedAI : MonoBehaviour
     {
         playerAccuracy = Player.GetComponent<PlayerController>().getAccuracy();
 
-        Debug.Log("First place is " + checkpointManager.getFirstPlace());
-        Debug.Log("Player Accuracy is " + playerAccuracy);
+        //Debug.Log("First place is " + checkpointManager.getFirstPlace());
+        //Debug.Log("Player Accuracy is " + playerAccuracy);
 
         if(playerAccuracy > hitChance)
         {

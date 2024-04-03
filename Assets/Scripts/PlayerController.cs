@@ -26,6 +26,7 @@ public class PlayerController : MonoBehaviour
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction hitAction;
+    private InputAction wiggleAction;
 
     private bool attemptHit; // For the note to know the hit button was pressed
     public bool hitEnabled = true;
@@ -38,6 +39,7 @@ public class PlayerController : MonoBehaviour
     public GameObject cannon;
     public GameObject bullet;
 
+    public Animator anim;
 
     public AudioSource audioSource;
 
@@ -46,6 +48,7 @@ public class PlayerController : MonoBehaviour
     public AudioClip highChannel;
 
     public Vector3 lastPos;
+    public float lastRot;
 
     public int myID = 0;
 
@@ -54,6 +57,8 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        anim = gameObject.GetComponentInChildren<Animator>();
+
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
@@ -64,21 +69,19 @@ public class PlayerController : MonoBehaviour
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
         hitAction = playerInput.actions["Hit"];
+        wiggleAction = playerInput.actions["Wiggle"];
 
         Cursor.lockState = CursorLockMode.Locked;
-
 
         audioSource = GetComponent<AudioSource>();
 
         //Used for speed calculation
         playerSpeedStatic = playerSpeed;
         lastPos = transform.position;
+        lastRot = transform.rotation.y;
         
         accuracy = 1;
-
         speedMod = 1f;
-    
-
     }
 
     void Update()
@@ -89,6 +92,27 @@ public class PlayerController : MonoBehaviour
         if (groundedPlayer && playerVelocity.y < 0)
         {
             playerVelocity.y = 0f;
+        }
+
+        //Macanim
+        if(Input.GetKeyDown(KeyCode.W)) 
+        {
+            anim.SetTrigger("Drive");
+        }
+
+        if(transform.rotation.y < lastRot)
+        {
+            anim.SetTrigger("TurningRight");
+        }
+
+        if(transform.rotation.y > lastRot)
+        {
+            anim.SetTrigger("TurningLeft");
+        }
+
+        if (Input.GetKeyDown(KeyCode.N)) 
+        {
+            anim.SetTrigger("Shake");
         }
 
         Vector2 input = moveAction.ReadValue<Vector2>();
@@ -153,6 +177,9 @@ public class PlayerController : MonoBehaviour
 
         //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
         speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
+        
+
+
     }
 
     public bool getAttemptHit()
