@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
+using UnityEngine.UI;
+
 
 public class PlayerController : MonoBehaviour
 {   
     public Camera camera;
-
     private CharacterController controller;
     private PlayerInput playerInput;
     
@@ -14,38 +16,78 @@ public class PlayerController : MonoBehaviour
     
     private bool groundedPlayer;
 
-    private float playerSpeed = 11.0f;
+    private float playerSpeed = 20.0f;
+    private float playerSpeedStatic;
     private float jumpHeight = 1.0f;
     private float gravityValue = -9.81f;
 
+    private float accuracy;
+
     private InputAction moveAction;
     private InputAction jumpAction;
-    private InputAction shootAction;
+    private InputAction hitAction;
+
+    private bool attemptHit; // For the note to know the hit button was pressed
+    public bool hitEnabled = true;
+
+    public AccuracyManager accuracyManager;
+    public float passedHits = 0f;
 
     private Transform cameraTransform;
-
-    public bool shootingEnabled = true;
 
     public GameObject cannon;
     public GameObject bullet;
 
+    public Animator anim;
+
+    public AudioSource audioSource;
+
+    public AudioClip lowChannel;
+    public AudioClip midChannel;
+    public AudioClip highChannel;
+
+    public Vector3 lastPos;
+    public float lastRot;
+
+    public int myID = 0;
+
+    public TMP_Text speedText;
+    private float speedMod;
 
     private void Start()
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
+        anim = GetComponentInChildren<Animator>();
+
+        attemptHit = false;
+
         cameraTransform = camera.transform;
 
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
-        shootAction = playerInput.actions["Shoot"];
+        hitAction = playerInput.actions["Hit"];
 
         Cursor.lockState = CursorLockMode.Locked;
+
+
+        audioSource = GetComponent<AudioSource>();
+
+        //Used for speed calculation
+        playerSpeedStatic = playerSpeed;
+        lastPos = transform.position;
+        lastRot = transform.rotation.y;
+        
+        accuracy = 1;
+
+        speedMod = 1f;
     }
 
     void Update()
     {
+        attemptHit = false;
+
         groundedPlayer = controller.isGrounded;
         if (groundedPlayer && playerVelocity.y < 0)
         {
@@ -54,6 +96,27 @@ public class PlayerController : MonoBehaviour
 
         Vector2 input = moveAction.ReadValue<Vector2>();
         Vector3 move = new Vector3(input.x, 0, input.y);
+
+        //Macanim
+        if(lastRot > transform.rotation.y)
+        {
+            anim.SetTrigger("TurningLeft");
+        }
+
+        if(lastRot < transform.rotation.y)
+        {
+            anim.SetTrigger("TurningRight");
+        }
+
+        if(Input.GetKeyDown(KeyCode.N))
+        {
+            anim.SetTrigger("Shake");
+        }
+
+        if(Vector3.Distance(transform.position, lastPos) / Time.deltaTime > 0)
+        {
+            anim.SetTrigger("Drive");
+        }
 
         move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
         move.y = 0.0f;
@@ -73,25 +136,98 @@ public class PlayerController : MonoBehaviour
         Quaternion playerRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
         transform.rotation = Quaternion.Slerp(transform.rotation, playerRotation, 5f * Time.deltaTime);
 
-        if(shootAction.triggered && shootingEnabled == true)
+        if(hitAction.triggered && hitEnabled == true)
         {
-            GameObject newBullet = GameObject.Instantiate(bullet, cannon.transform.position, cannon.transform.rotation) as GameObject;
-            newBullet.GetComponent<Rigidbody>().velocity += Vector3.up * 2;
-            newBullet.GetComponent<Rigidbody>().AddForce(newBullet.transform.forward * 1500);
+            attemptHit = true;
         }
 
         if(Input.GetKeyDown(KeyCode.Escape))
         {
             Application.Quit();
         }
+
+        //Get Audio Mixer
+        var pitchBendGroup = Resources.Load<UnityEngine.Audio.AudioMixerGroup>("MyAudioMixer"); 
+        audioSource.outputAudioMixerGroup = pitchBendGroup;
+
+        if(accuracy < .5)
+        {
+            playerSpeed = playerSpeedStatic * 0.75f;
+        }
+        else
+        {
+            playerSpeed = playerSpeedStatic;
+        }
+
+        //Calculate player speed
+        float speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
+        lastPos = transform.position;
+        lastRot = transform.rotation.y;
+
+        //Normalize speed 
+        float newPitch = speed/playerSpeedStatic;
+
+        //Add pitch modifier
+        if(newPitch > .9)
+        {
+            newPitch = 1f;
+        }
+
+        audioSource.pitch = newPitch; 
+        pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
+
+        //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
+        speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
     }
 
-
-    void OnCollisionEnter(Collision collision)
+    public bool getAttemptHit()
     {
-        GameObject hitObject = collision.gameObject;
+        return attemptHit;
+    }
+
+    public void addHit()
+    {
+        accuracyManager.hits += 1;
+        passedHits += 1;
+        accuracy = accuracyManager.hits/passedHits;
+    }
+    public void MissedHit()
+    {
+        passedHits += 1;
+        accuracy = accuracyManager.hits/passedHits;
+    }
+
+    public float getAccuracy()
+    {
+        return accuracy;
+    }
+
+    public int getID()
+    {
+        return myID;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+
+        if(other.gameObject.tag == "High")
+        {
+            audioSource.clip = highChannel;
+            audioSource.Play();
+        }
+        else if(other.gameObject.tag == "Mid")
+        {
+            audioSource.clip = midChannel;
+            audioSource.Play();
+        }
+        else if(other.gameObject.tag == "Low")
+        {
+            audioSource.clip = lowChannel;
+            audioSource.Play();
+        }
 
         //Debug.Log("Collision Detected");
-        //Debug.Log(hitObject.tag);
+        //Debug.Log(other.gameObject.tag);
     }
+
 }
