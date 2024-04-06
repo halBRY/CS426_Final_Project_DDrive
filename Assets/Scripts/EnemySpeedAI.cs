@@ -27,6 +27,8 @@ public class EnemySpeedAI : MonoBehaviour
     Rigidbody rb;
     Transform t;
 
+    UnityEngine.AI.NavMeshAgent myAi;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -35,6 +37,8 @@ public class EnemySpeedAI : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
         t = GetComponent<Transform>();
+
+        myAi = gameObject.GetComponent<UnityEngine.AI.NavMeshAgent>();
     }
 
     // Update is called once per frame
@@ -42,8 +46,8 @@ public class EnemySpeedAI : MonoBehaviour
     {
         playerAccuracy = Player.GetComponent<PlayerController>().getAccuracy();
 
-        Debug.Log("First place is " + checkpointManager.getFirstPlace());
-        Debug.Log("Player Accuracy is " + playerAccuracy);
+        //Debug.Log("First place is " + checkpointManager.getFirstPlace());
+        //Debug.Log("Player Accuracy is " + playerAccuracy);
 
         if(playerAccuracy > hitChance)
         {
@@ -84,6 +88,8 @@ public class EnemySpeedAI : MonoBehaviour
             if(hitChance < maxHitChance)
                 hitChance += 0.001f;
         }
+        
+        myAi.speed = speed;
 
         //Debug controls
         /*
