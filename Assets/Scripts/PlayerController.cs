@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
 
     private float playerSpeed = 20.0f;
     private float playerSpeedStatic;
-    private float jumpHeight = 1.0f;
+    private float jumpHeight = 0.0f;
     private float gravityValue = -9.81f;
 
     private float accuracy;
@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject cannon;
     public GameObject bullet;
-
+    public GameObject flag;
 
     public AudioSource audioSource;
 
@@ -83,6 +83,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            Instantiate (flag, gameObject.transform.position, Quaternion.identity);
+        }
+
         attemptHit = false;
 
         groundedPlayer = controller.isGrounded;
