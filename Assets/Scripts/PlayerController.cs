@@ -37,7 +37,8 @@ public class PlayerController : MonoBehaviour
 
     public GameObject cannon;
     public GameObject bullet;
-    public GameObject flag;
+
+    public Animator anim;
 
     public AudioSource audioSource;
 
@@ -45,7 +46,12 @@ public class PlayerController : MonoBehaviour
     public AudioClip midChannel;
     public AudioClip highChannel;
 
+    public AudioClip Switch_Section1_Intro;
+    public AudioClip Section1Loop;
+    public AudioClip section1Body;
+
     public Vector3 lastPos;
+    public float lastRot;
 
     public int myID = 0;
 
@@ -56,6 +62,8 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
+
+        anim = GetComponentInChildren<Animator>();
 
         attemptHit = false;
 
@@ -73,19 +81,18 @@ public class PlayerController : MonoBehaviour
         //Used for speed calculation
         playerSpeedStatic = playerSpeed;
         lastPos = transform.position;
+        lastRot = transform.rotation.y;
         
         accuracy = 1;
 
         speedMod = 1f;
-    
-
     }
 
     void Update()
     {
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            Instantiate (flag, gameObject.transform.position, Quaternion.identity);
+            Instantiate (bullet, gameObject.transform.position, Quaternion.identity);
         }
 
         attemptHit = false;
@@ -98,6 +105,27 @@ public class PlayerController : MonoBehaviour
 
         Vector2 input = moveAction.ReadValue<Vector2>();
         Vector3 move = new Vector3(input.x, 0, input.y);
+
+        //Macanim
+        if(lastRot > transform.rotation.y)
+        {
+            anim.SetTrigger("TurningLeft");
+        }
+
+        if(lastRot < transform.rotation.y)
+        {
+            anim.SetTrigger("TurningRight");
+        }
+
+        if(Input.GetKeyDown(KeyCode.N))
+        {
+            anim.SetTrigger("Shake");
+        }
+
+        if(Vector3.Distance(transform.position, lastPos) / Time.deltaTime > 0)
+        {
+            anim.SetTrigger("Drive");
+        }
 
         move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
         move.y = 0.0f;
@@ -143,6 +171,7 @@ public class PlayerController : MonoBehaviour
         //Calculate player speed
         float speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
         lastPos = transform.position;
+        lastRot = transform.rotation.y;
 
         //Normalize speed 
         float newPitch = speed/playerSpeedStatic;
