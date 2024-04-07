@@ -55,4 +55,3 @@ How it comes all together:
 * The car will work together with the hit notes to make a rhythm game where the players try to get 
   the highest score they can with the best accuracy. Using PCB textures will help make the game feel
   more "in a computer". AI racers will act like other rouge programs that want all the data to themselves.
-  
