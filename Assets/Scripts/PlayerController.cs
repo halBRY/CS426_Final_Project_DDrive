@@ -56,6 +56,8 @@ public class PlayerController : MonoBehaviour
     public int myID = 0;
 
     public TMP_Text speedText;
+
+    public float textFadeTime;
     private float speedMod;
 
     private void Start()
@@ -90,6 +92,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        
         if(Input.GetKeyDown(KeyCode.Space))
         {
             Instantiate (bullet, gameObject.transform.position, Quaternion.identity);
@@ -197,6 +200,12 @@ public class PlayerController : MonoBehaviour
     public void addHit()
     {
         accuracyManager.hits += 1;
+        passedHits += 1;
+        accuracy = accuracyManager.hits/passedHits;
+    }
+        public void addHalfHit()
+    {
+        accuracyManager.hits += 0.5f;
         passedHits += 1;
         accuracy = accuracyManager.hits/passedHits;
     }
