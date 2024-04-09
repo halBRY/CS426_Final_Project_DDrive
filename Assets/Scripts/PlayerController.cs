@@ -42,13 +42,7 @@ public class PlayerController : MonoBehaviour
 
     public AudioSource audioSource;
 
-    public AudioClip lowChannel;
-    public AudioClip midChannel;
-    public AudioClip highChannel;
-
-    public AudioClip Switch_Section1_Intro;
-    public AudioClip Section1Loop;
-    public AudioClip section1Body;
+    public AudioClip startSound;
 
     public Vector3 lastPos;
     public float lastRot;
@@ -95,7 +89,8 @@ public class PlayerController : MonoBehaviour
         
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            Instantiate (bullet, gameObject.transform.position, Quaternion.identity);
+            GameObject myflag = Instantiate(bullet, gameObject.transform.position, gameObject.transform.rotation);
+            myflag.GetComponent<audioSwitch>().myPlayer = gameObject;
         }
 
         attemptHit = false;
@@ -110,6 +105,7 @@ public class PlayerController : MonoBehaviour
         Vector3 move = new Vector3(input.x, 0, input.y);
 
         //Macanim
+        /*
         if(lastRot > transform.rotation.y)
         {
             anim.SetTrigger("TurningLeft");
@@ -128,7 +124,7 @@ public class PlayerController : MonoBehaviour
         if(Vector3.Distance(transform.position, lastPos) / Time.deltaTime > 0)
         {
             anim.SetTrigger("Drive");
-        }
+        }*/
 
         move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
         move.y = 0.0f;
@@ -190,6 +186,13 @@ public class PlayerController : MonoBehaviour
 
         //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
         speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
+
+        if(gameObject.transform.position.y <= -30)
+        {
+            gameObject.transform.position = new Vector3(1.06f, 1.06f, -45.1f);
+            audioSource.clip = startSound;
+            audioSource.Play();
+        }
     }
 
     public bool getAttemptHit()
@@ -227,23 +230,6 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-
-        if(other.gameObject.tag == "High")
-        {
-            audioSource.clip = highChannel;
-            audioSource.Play();
-        }
-        else if(other.gameObject.tag == "Mid")
-        {
-            audioSource.clip = midChannel;
-            audioSource.Play();
-        }
-        else if(other.gameObject.tag == "Low")
-        {
-            audioSource.clip = lowChannel;
-            audioSource.Play();
-        }
-
         //Debug.Log("Collision Detected");
         //Debug.Log(other.gameObject.tag);
     }
