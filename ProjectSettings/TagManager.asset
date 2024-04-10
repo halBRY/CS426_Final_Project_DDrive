@@ -15,6 +15,7 @@ TagManager:
   - HitCenter
   - HitLate
   - Virus
+  - TrackTime
   layers:
   - Default
   - TransparentFX
@@ -24,7 +25,7 @@ TagManager:
   - UI
   - outofbounds
   - notes
-  - 
+  - MiniMap
   - 
   - 
   - 

@@ -11,6 +11,7 @@ public class HitNote : MonoBehaviour
     private bool checkingForHits = true;
     private bool missedNote = false;
 
+
     // Each fram checks if player is in trigger, if so check player is pressing hit button
     void Update()
     {
@@ -32,7 +33,7 @@ public class HitNote : MonoBehaviour
                     Debug.Log("hit early");
                     accuracyManager.Early();
                     Destroy(transform.parent.gameObject);
-                    player.addHit();
+                    player.addHalfHit();
                     canHit = false;
                 }
                 else if(gameObject.tag == "HitLate")
@@ -40,7 +41,7 @@ public class HitNote : MonoBehaviour
                     Debug.Log("hit late");
                     accuracyManager.Late();
                     Destroy(transform.parent.gameObject);
-                    player.addHit();
+                    player.addHalfHit();
                     canHit = false;
                 }
             }

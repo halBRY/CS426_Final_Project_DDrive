@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public Camera camera;
     private CharacterController controller;
     private PlayerInput playerInput;
+
+    public TrackTime trackTime;
     
     private Vector3 playerVelocity;
     
@@ -35,20 +37,17 @@ public class PlayerController : MonoBehaviour
 
     private Transform cameraTransform;
 
+    public Transform startingLocation;
+
     public GameObject cannon;
     public GameObject bullet;
 
     public Animator anim;
 
     public AudioSource audioSource;
+    public AudioSource carSounds;
 
-    public AudioClip lowChannel;
-    public AudioClip midChannel;
-    public AudioClip highChannel;
-
-    public AudioClip Switch_Section1_Intro;
-    public AudioClip Section1Loop;
-    public AudioClip section1Body;
+    public AudioClip startSound;
 
     public Vector3 lastPos;
     public float lastRot;
@@ -56,7 +55,23 @@ public class PlayerController : MonoBehaviour
     public int myID = 0;
 
     public TMP_Text speedText;
+    public TMP_Text justSpeed;
+
+    public float textFadeTime;
     private float speedMod;
+
+     //SPEEDOMETER
+    public Texture2D backTex;
+	public Texture2D dialTex;
+	public Texture2D needleTex;
+	public Texture2D needleCache;
+	public float needleSizeRatio=3;
+	public Vector2 counterPos;
+	public Vector2 counterSize = new Vector2(200,200);
+	public float topSpeed=100;
+	public float stopAngle=-211;
+	public float topSpeedAngle=31;
+    public float speed;
 
     private void Start()
     {
@@ -73,9 +88,6 @@ public class PlayerController : MonoBehaviour
         jumpAction = playerInput.actions["Jump"];
         hitAction = playerInput.actions["Hit"];
 
-        Cursor.lockState = CursorLockMode.Locked;
-
-
         audioSource = GetComponent<AudioSource>();
 
         //Used for speed calculation
@@ -89,10 +101,16 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update()
-    {
+    {   
+        if(trackTime.gameStarted)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            Instantiate (bullet, gameObject.transform.position, Quaternion.identity);
+            GameObject myflag = Instantiate(bullet, gameObject.transform.position, gameObject.transform.rotation);
+            myflag.GetComponent<audioSwitch>().myPlayer = gameObject;
         }
 
         attemptHit = false;
@@ -107,6 +125,7 @@ public class PlayerController : MonoBehaviour
         Vector3 move = new Vector3(input.x, 0, input.y);
 
         //Macanim
+        /*
         if(lastRot > transform.rotation.y)
         {
             anim.SetTrigger("TurningLeft");
@@ -125,7 +144,7 @@ public class PlayerController : MonoBehaviour
         if(Vector3.Distance(transform.position, lastPos) / Time.deltaTime > 0)
         {
             anim.SetTrigger("Drive");
-        }
+        }*/
 
         move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
         move.y = 0.0f;
@@ -169,9 +188,20 @@ public class PlayerController : MonoBehaviour
         }
 
         //Calculate player speed
-        float speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
+         speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
         lastPos = transform.position;
         lastRot = transform.rotation.y;
+
+        justSpeed.text = string.Format("{0:#.00}", speed);
+
+        if(speed == 0)
+        {
+            carSounds.volume = 0.1f;
+        }
+        else
+        {
+            carSounds.volume = 0f;
+        }
 
         //Normalize speed 
         float newPitch = speed/playerSpeedStatic;
@@ -187,6 +217,13 @@ public class PlayerController : MonoBehaviour
 
         //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
         speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
+
+        if(gameObject.transform.position.y <= -30)
+        {
+            gameObject.transform.position = new Vector3(1.06f, 1.06f, -45.1f);
+            audioSource.clip = startSound;
+            audioSource.Play();
+        }
     }
 
     public bool getAttemptHit()
@@ -197,6 +234,12 @@ public class PlayerController : MonoBehaviour
     public void addHit()
     {
         accuracyManager.hits += 1;
+        passedHits += 1;
+        accuracy = accuracyManager.hits/passedHits;
+    }
+        public void addHalfHit()
+    {
+        accuracyManager.hits += 0.5f;
         passedHits += 1;
         accuracy = accuracyManager.hits/passedHits;
     }
@@ -218,25 +261,33 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-
-        if(other.gameObject.tag == "High")
-        {
-            audioSource.clip = highChannel;
-            audioSource.Play();
-        }
-        else if(other.gameObject.tag == "Mid")
-        {
-            audioSource.clip = midChannel;
-            audioSource.Play();
-        }
-        else if(other.gameObject.tag == "Low")
-        {
-            audioSource.clip = lowChannel;
-            audioSource.Play();
-        }
-
         //Debug.Log("Collision Detected");
         //Debug.Log(other.gameObject.tag);
     }
+    void  OnGUI (){
+
+		// Draw the back
+		GUI.DrawTexture( new Rect(counterPos.x, counterPos.y, counterSize.x, counterSize.y), backTex);
+
+		// Draw the counter
+		GUI.DrawTexture( new Rect(counterPos.x+15, counterPos.y+15, counterSize.x-30, counterSize.y-30), dialTex);
+
+		// Calculate center
+		Vector2 centre= new Vector2(counterPos.x + (counterSize.x / 2), counterPos.y + (counterSize.y / 2) );
+		Matrix4x4 savedMatrix= GUI.matrix;
+
+		// Calculate angle
+		float speedFraction= speed / topSpeed;
+		float needleAngle= Mathf.Lerp(stopAngle, topSpeedAngle, speedFraction);
+
+		GUIUtility.RotateAroundPivot(needleAngle, centre);
+
+		// Draw the needle
+		GUI.DrawTexture( new Rect(centre.x+5, (centre.y+10) - needleTex.height / 2, needleTex.width/needleSizeRatio, needleTex.height/needleSizeRatio), needleTex);
+		GUI.matrix = savedMatrix;
+
+		// Draw the needle cache
+		GUI.DrawTexture( new Rect(centre.x-30, centre.y-30, 60, 60), needleCache);
+	}
 
 }
