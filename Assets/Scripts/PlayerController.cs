@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     public Camera camera;
     private CharacterController controller;
     private PlayerInput playerInput;
+
+    public TrackTime trackTime;
     
     private Vector3 playerVelocity;
     
@@ -73,9 +75,6 @@ public class PlayerController : MonoBehaviour
         jumpAction = playerInput.actions["Jump"];
         hitAction = playerInput.actions["Hit"];
 
-        Cursor.lockState = CursorLockMode.Locked;
-
-
         audioSource = GetComponent<AudioSource>();
 
         //Used for speed calculation
@@ -89,8 +88,12 @@ public class PlayerController : MonoBehaviour
     }
 
     void Update()
-    {
-        
+    {   
+        if(trackTime.gameStarted)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
         if(Input.GetKeyDown(KeyCode.Space))
         {
             GameObject myflag = Instantiate(bullet, gameObject.transform.position, gameObject.transform.rotation);
