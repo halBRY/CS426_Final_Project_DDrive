@@ -35,6 +35,8 @@ public class PlayerController : MonoBehaviour
 
     private Transform cameraTransform;
 
+    public Transform startingLocation;
+
     public GameObject cannon;
     public GameObject bullet;
 
@@ -182,7 +184,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
-             carSounds.volume = 0f;
+            carSounds.volume = 0f;
         }
 
         //Normalize speed 
