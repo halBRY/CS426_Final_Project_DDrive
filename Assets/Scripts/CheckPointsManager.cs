@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.UI;
 
 public class CheckPointsManager : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class CheckPointsManager : MonoBehaviour
     public int[] driversLastPoint;
 
     public int firstPlaceID = -1;
+
+    public Slider progressBar;
 
     private void Awake()
     {
@@ -34,6 +37,7 @@ public class CheckPointsManager : MonoBehaviour
         }
 
         driversLastPoint = new int[numDrivers];
+        progressBar.maxValue = myCheckpoints.Count;
     }
 
     private void Update()
@@ -46,6 +50,9 @@ public class CheckPointsManager : MonoBehaviour
 
             //Find who arrived first at that checkpoint
             firstPlaceID = myCheckpointFirstArrival[farthestCheckpoint];
+
+            //Update progress bar
+            progressBar.value = farthestCheckpoint;
         }
     }
 

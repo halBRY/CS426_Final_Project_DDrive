@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour
     public Animator anim;
 
     public AudioSource audioSource;
+    public AudioSource carSounds;
 
     public AudioClip startSound;
 
@@ -50,6 +51,7 @@ public class PlayerController : MonoBehaviour
     public int myID = 0;
 
     public TMP_Text speedText;
+    public TMP_Text justSpeed;
 
     public float textFadeTime;
     private float speedMod;
@@ -171,6 +173,17 @@ public class PlayerController : MonoBehaviour
         float speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
         lastPos = transform.position;
         lastRot = transform.rotation.y;
+
+        justSpeed.text = string.Format("{0:#.00}", speed);
+
+        if(speed == 0)
+        {
+            carSounds.volume = 0.1f;
+        }
+        else
+        {
+             carSounds.volume = 0f;
+        }
 
         //Normalize speed 
         float newPitch = speed/playerSpeedStatic;
