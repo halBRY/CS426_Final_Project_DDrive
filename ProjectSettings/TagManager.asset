@@ -15,6 +15,7 @@ TagManager:
   - HitCenter
   - HitLate
   - Virus
+  - TrackTime
   layers:
   - Default
   - TransparentFX
