@@ -80,4 +80,4 @@ Player:
 
 Sound:
 * The background song was edited into different sections, so that longer channels of the track are able to loop the music.
-* When the player is not moving, the music stops, and an idle sound plays. 
+* When the player is not moving, the music stops, and an idle sound plays. The engine idle sound was acquired from freesounds.org. 
