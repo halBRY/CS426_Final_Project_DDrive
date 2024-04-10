@@ -55,3 +55,29 @@ How it comes all together:
 * The car will work together with the hit notes to make a rhythm game where the players try to get 
   the highest score they can with the best accuracy. Using PCB textures will help make the game feel
   more "in a computer". AI racers will act like other rouge programs that want all the data to themselves.
+
+  
+## A7:
+
+For assignment 7, various UI elements were added to expose more of the game to the players, such as a minimap or feedback for the note system. 
+
+Track:
+* Extended track to include entire song
+* Sync all music sections to track
+* Changed out of bounds plane to instead outline the track, helping with the clarity of the track
+* Added more elevation variation to track.
+* Added a minimap to further assist clarity by improving navigation
+* Added a progress bar to show how much of the track remains
+
+Hits:
+* Added indication of early, late, and missed notes
+* Added combo tracker
+* Updated appearance of score and accuracy UI elements
+
+Player:
+* Player speed is now shown as a speedometer
+* Player hitbox clearly indicated
+
+Sound:
+* The background song was edited into different sections, so that longer channels of the track are able to loop the music.
+* When the player is not moving, the music stops, and an idle sound plays. 
