@@ -120,6 +120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   accuracyManager: {fileID: 0}
   player: {fileID: 0}
+  audioPlayer: {fileID: 0}
 --- !u!1 &4299129527199936813
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,6 +242,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   accuracyManager: {fileID: 0}
   player: {fileID: 0}
+  audioPlayer: {fileID: 0}
 --- !u!1 &4622203697179714156
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,3 +565,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   accuracyManager: {fileID: 0}
   player: {fileID: 0}
+  audioPlayer: {fileID: 0}

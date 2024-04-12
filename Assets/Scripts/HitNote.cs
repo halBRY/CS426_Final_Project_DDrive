@@ -6,7 +6,6 @@ public class HitNote : MonoBehaviour
 {
     public AccuracyManager accuracyManager;
     public PlayerController player;
-
     private bool canHit = false;
     private bool checkingForHits = true;
     private bool missedNote = false;
@@ -28,7 +27,8 @@ public class HitNote : MonoBehaviour
         {
             if(player.getAttemptHit())
             {
-                // Supposed to add early and late hits. But was buggy so only the center one exist
+                player.playHitSound();
+                // Early and late hits
                 if(gameObject.tag == "HitCenter")
                 {
                     Debug.Log("hit perfect");

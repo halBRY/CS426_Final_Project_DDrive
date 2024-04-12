@@ -42,6 +42,15 @@ public class AccuracyManager : MonoBehaviour
     }
 
     // How scoring will add and combos
+    public void HoldNote()
+    {
+        combo++;
+        hitTypeText.text = "";
+        noteScoreText.text = "";
+        score += 100 * combo;
+        accuracyText.text = score.ToString();
+        comboText.text = "x" + combo.ToString();
+    }
     public void Perfect()
     {
         combo++;

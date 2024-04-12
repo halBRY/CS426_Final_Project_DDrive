@@ -46,6 +46,7 @@ public class PlayerController : MonoBehaviour
 
     public AudioSource audioSource;
     public AudioSource carSounds;
+    public AudioSource hitSound;
 
     public AudioClip startSound;
 
@@ -237,7 +238,7 @@ public class PlayerController : MonoBehaviour
         passedHits += 1;
         accuracy = accuracyManager.hits/passedHits;
     }
-        public void addHalfHit()
+    public void addHalfHit()
     {
         accuracyManager.hits += 0.5f;
         passedHits += 1;
@@ -257,6 +258,10 @@ public class PlayerController : MonoBehaviour
     public int getID()
     {
         return myID;
+    }
+
+    public void playHitSound(){
+        hitSound.Play();
     }
 
     void OnTriggerEnter(Collider other)

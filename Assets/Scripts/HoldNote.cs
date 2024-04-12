@@ -12,9 +12,14 @@ public class HoldNote : MonoBehaviour
     private bool missedNote = false;
     // Start is called before the first frame update
     private bool hitStart;
+
+    private Color emissionColor = Color.blue;
+
+    private Material material;
+
     void Start()
     {
-        
+        material = GetComponent<Renderer>().material;
     }
 
     // Update is called once per frame
@@ -25,7 +30,9 @@ public class HoldNote : MonoBehaviour
             if(player.getAttemptHit())
             {
                 Debug.Log("hold hit");
-                accuracyManager.Perfect();
+                accuracyManager.HoldNote();
+                player.addHit();
+                player.playHitSound();
                 gameObject.GetComponent<Renderer>().enabled = false;
                 hitStart = true;
                 canHit = false;
@@ -42,18 +49,21 @@ public class HoldNote : MonoBehaviour
         
         if(gameObject.tag == "HoldStart")
         {
+            SetEmissionColor(emissionColor);
             canHit = true;
         }
         else if (getStart() && gameObject.tag == "HoldEnd")
         {
                 Debug.Log("Hold hit end");
-                accuracyManager.Perfect();
+                accuracyManager.HoldNote();
+                player.addHit();
                 Destroy(transform.parent.gameObject);
         }
         else if (getStart() && gameObject.tag == "HoldCenter")
         {
                 Debug.Log("Hold hit center");
-                accuracyManager.Perfect();
+                accuracyManager.HoldNote();
+                player.addHit();
                 Destroy(gameObject);
         }
      
@@ -63,6 +73,7 @@ public class HoldNote : MonoBehaviour
     void OnTriggerExit(Collider collider)
     {
         // In if to prevent a note being counted twice if missed
+        SetEmissionColor(Color.black);
         if(!missedNote && !getStart())
         {
             missedNote = true;
@@ -77,5 +88,13 @@ public class HoldNote : MonoBehaviour
     bool getStart()
     {
         return startHold.hitStart;
+    }
+
+    private void SetEmissionColor(Color color)
+    {
+        // Set the emission color of the material
+        material.SetColor("_EmissionColor", color);
+        // Activate emission
+        material.EnableKeyword("_EMISSION");
     }
 }
