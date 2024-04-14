@@ -19,9 +19,14 @@ public class PlayerController : MonoBehaviour
     private bool groundedPlayer;
 
     private float playerSpeed = 20.0f;
+    private float playerAccel = 1f;
+    private float playerSpeedDynamic = 0f;
     private float playerSpeedStatic;
     private float jumpHeight = 0.0f;
     private float gravityValue = -9.81f;
+
+    private bool isDriving = false;
+    private Vector3 lastDriveMove;
 
     private float accuracy;
 
@@ -61,7 +66,7 @@ public class PlayerController : MonoBehaviour
     public float textFadeTime;
     private float speedMod;
 
-     //SPEEDOMETER
+    //SPEEDOMETER
     public Texture2D backTex;
 	public Texture2D dialTex;
 	public Texture2D needleTex;
@@ -97,7 +102,6 @@ public class PlayerController : MonoBehaviour
         lastRot = transform.rotation.y;
         
         accuracy = 1;
-
         speedMod = 1f;
     }
 
@@ -150,7 +154,39 @@ public class PlayerController : MonoBehaviour
         move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
         move.y = 0.0f;
 
-        controller.Move(move * Time.deltaTime * playerSpeed);
+        moveAction.performed += speedUp;
+        moveAction.canceled += speedDown;
+
+        if(isDriving)
+        {
+            if(playerSpeedDynamic < playerSpeed)
+            {
+                playerSpeedDynamic += playerAccel;
+            }
+            else if(playerSpeedDynamic >= playerSpeed)
+            {
+                playerSpeedDynamic = playerSpeed;
+            }
+
+            lastDriveMove = move;
+            controller.Move(move * Time.deltaTime * playerSpeedDynamic);
+        }
+        else
+        {
+            if(playerSpeedDynamic <= 0)
+            {
+                playerSpeedDynamic = 0;
+            }
+            else
+            {
+                playerSpeedDynamic -= playerAccel;
+            }
+
+            //lastDriveMove = lastDriveMove * Time.deltaTime * playerSpeedDynamic;
+            controller.Move(lastDriveMove * Time.deltaTime * playerSpeedDynamic);
+        }
+
+        //controller.Move(move * Time.deltaTime * playerSpeedDynamic);
 
         // Changes the height position of the player..
         if (jumpAction.triggered && groundedPlayer)
@@ -226,6 +262,15 @@ public class PlayerController : MonoBehaviour
             audioSource.Play();
         }
     }
+    void speedUp(InputAction.CallbackContext obj)
+    {
+        isDriving = true;
+    }
+
+    void speedDown(InputAction.CallbackContext obj)
+    {
+        isDriving = false;
+    }
 
     public bool getAttemptHit()
     {
@@ -269,6 +314,7 @@ public class PlayerController : MonoBehaviour
         //Debug.Log("Collision Detected");
         //Debug.Log(other.gameObject.tag);
     }
+    
     void  OnGUI (){
 
 		// Draw the back
