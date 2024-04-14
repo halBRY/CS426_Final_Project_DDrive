@@ -4,7 +4,6 @@ using TMPro;
 
 public class AccuracyManager : MonoBehaviour
 {
-    // Start is called before the first frame update
     public TMP_Text accuracyText;
     public TMP_Text comboText;
     public TMP_Text hitTypeText;
@@ -19,6 +18,7 @@ public class AccuracyManager : MonoBehaviour
     public float hits;
     uint score;
     uint combo; 
+
     void Start()
     {
         score = 0;

@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     public Camera camera;
     private CharacterController controller;
     private PlayerInput playerInput;
+    public GameObject boonModel;
 
     public TrackTime trackTime;
     
@@ -36,6 +37,10 @@ public class PlayerController : MonoBehaviour
 
     private bool attemptHit; // For the note to know the hit button was pressed
     public bool hitEnabled = true;
+    public bool boonActive;
+    public bool trackBoonTime;
+    public float boonStartTime;
+    public float boonEndTime;
 
     public AccuracyManager accuracyManager;
     public float passedHits = 0f;
@@ -103,6 +108,8 @@ public class PlayerController : MonoBehaviour
         
         accuracy = 1;
         speedMod = 1f;
+
+        trackBoonTime = true;
     }
 
     void Update()
@@ -116,6 +123,21 @@ public class PlayerController : MonoBehaviour
         {
             GameObject myflag = Instantiate(bullet, gameObject.transform.position, gameObject.transform.rotation);
             myflag.GetComponent<audioSwitch>().myPlayer = gameObject;
+        }
+
+        // Enable boon for 4 seconds
+        if(boonActive && trackBoonTime)
+        {
+            boonStartTime = Time.time;
+            boonEndTime = Time.time + 10f; //wait 5 seconds
+            trackBoonTime = false;
+        }
+
+        //Deactivate boon
+        if(boonActive && Time.time > boonEndTime)
+        {
+            boonActive = false;
+            boonModel.SetActive(false);
         }
 
         attemptHit = false;
@@ -307,6 +329,12 @@ public class PlayerController : MonoBehaviour
 
     public void playHitSound(){
         hitSound.Play();
+    }
+
+    public void BoonActivate()
+    {
+        boonActive = true;
+        boonModel.SetActive(true);
     }
 
     void OnTriggerEnter(Collider other)

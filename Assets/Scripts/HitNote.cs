@@ -10,6 +10,8 @@ public class HitNote : MonoBehaviour
     private bool checkingForHits = true;
     private bool missedNote = false;
 
+    public bool isBoonHit;
+    
     private Color emissionColor = Color.blue;
 
     private Material material;
@@ -28,30 +30,49 @@ public class HitNote : MonoBehaviour
             if(player.getAttemptHit())
             {
                 player.playHitSound();
+                if(isBoonHit)
+                {
+                    player.BoonActivate();
+                }
                 // Early and late hits
-                if(gameObject.tag == "HitCenter")
+                // Updated to add early/late immunity boon
+                if(player.boonActive)
                 {
-                    Debug.Log("hit perfect");
-                    accuracyManager.Perfect();
-                    Destroy(transform.parent.gameObject);
-                    player.addHit();
-                    canHit = false;
+                    if(gameObject.tag == "HitCenter" || gameObject.tag == "HitEarly" || gameObject.tag == "HitLate")
+                    {
+                        Debug.Log("hit perfect");
+                        accuracyManager.Perfect();
+                        Destroy(transform.parent.gameObject);
+                        player.addHit();
+                        canHit = false;
+                    }  
                 }
-                else if(gameObject.tag == "HitEarly")
+                else
                 {
-                    Debug.Log("hit early");
-                    accuracyManager.Early();
-                    Destroy(transform.parent.gameObject);
-                    player.addHalfHit();
-                    canHit = false;
-                }
-                else if(gameObject.tag == "HitLate")
-                {
-                    Debug.Log("hit late");
-                    accuracyManager.Late();
-                    Destroy(transform.parent.gameObject);
-                    player.addHalfHit();
-                    canHit = false;
+                    if(gameObject.tag == "HitCenter")
+                    {
+                        Debug.Log("hit perfect");
+                        accuracyManager.Perfect();
+                        Destroy(transform.parent.gameObject);
+                        player.addHit();
+                        canHit = false;
+                    }
+                    else if(gameObject.tag == "HitEarly")
+                    {
+                        Debug.Log("hit early");
+                        accuracyManager.Early();
+                        Destroy(transform.parent.gameObject);
+                        player.addHalfHit();
+                        canHit = false;
+                    }
+                    else if(gameObject.tag == "HitLate")
+                    {
+                        Debug.Log("hit late");
+                        accuracyManager.Late();
+                        Destroy(transform.parent.gameObject);
+                        player.addHalfHit();
+                        canHit = false;
+                    }
                 }
             }
             checkingForHits = false;
