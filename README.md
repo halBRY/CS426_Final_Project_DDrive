@@ -82,4 +82,22 @@ Player:
 
 Sound:
 * The background song was edited into different sections, so that longer channels of the track are able to loop the music.
-* When the player is not moving, the music stops, and an idle sound plays. The engine idle sound was acquired from freesounds.org. 
+* When the player is not moving, the music stops, and an idle sound plays. The engine idle sound was acquired from freesounds.org.
+
+## A8:
+
+Shaders:
+* Hits change the emissions part of the shader if you are in the center of the note. Hold notes also change emission when at the start part.
+* Shader of the car changes when power-up is picked up
+
+Forms of writing:
+* Opening screen that pops up at the start of the game
+* Ending screen that shows the player their score and accuracy
+
+Modifications from alpha to beta:
+* Track is now complete
+* Driving controls are better
+* Crossfade between different tracks to make the audio more natural sounding
+* Notes have different colors
+* Added hit sounds for feedback
+
