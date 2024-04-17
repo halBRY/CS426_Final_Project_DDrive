@@ -92,12 +92,13 @@ Shaders:
 
 Forms of writing:
 * Opening screen that pops up at the start of the game
-* Ending screen that shows the player their score and accuracy
+* Controls and credits pages
+* Ending screen that shows the player their score, accuracy, time, and if they hit par. 
 
 Modifications from alpha to beta:
 * Track is now complete
 * Driving controls are better
-* Crossfade between different tracks to make the audio more natural sounding
+* Driving has acceleration/decceleration
 * Notes have different colors
 * Added hit sounds for feedback
 
