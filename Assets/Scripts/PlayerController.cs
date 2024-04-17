@@ -356,6 +356,7 @@ public class PlayerController : MonoBehaviour
 		Matrix4x4 savedMatrix= GUI.matrix;
 
 		// Calculate angle
+        speed = speed *2;
 		float speedFraction= speed / topSpeed;
 		float needleAngle= Mathf.Lerp(stopAngle, topSpeedAngle, speedFraction);
 
