@@ -24,6 +24,10 @@ public class TrackTime : MonoBehaviour
     public TMP_Text timeText;
     public TMP_Text accurText;
     public TMP_Text scoreText;
+    public TMP_Text timeTextpassFail;
+    public TMP_Text accurTextpassFail;
+    public TMP_Text scoreTextpassFail;
+    public TMP_Text clearText;
 
     public float startTime;
     public float currentTime;
@@ -32,6 +36,9 @@ public class TrackTime : MonoBehaviour
     public TMP_Text timer;
 
     public bool gameStarted = false;
+
+    public float parTime = 240f;
+    public float parAccuracy = 50f;
 
     public void beginGame()
     {
@@ -87,7 +94,36 @@ public class TrackTime : MonoBehaviour
         int seconds = Mathf.FloorToInt(endTime % 60f);
 
         timeText.text = minutes.ToString("00") + " : " + seconds.ToString("00");
-        accurText.text = string.Format("{0:#.00}%", myPlayer.getAccuracy());
+        accurText.text = string.Format("{0:#.00}%", (myPlayer.getAccuracy()* 100));
         scoreText.text = accuracyManager.getScore().ToString();
+
+        if(endTime < parTime && (myPlayer.getAccuracy()* 100) > parAccuracy)
+        {
+            timeTextpassFail.text = "Pass";
+            accurTextpassFail.text = "Pass";
+            scoreTextpassFail.text = "Pass";
+            clearText.text = "Track Cleared";
+        }
+        else if(endTime > parTime && (myPlayer.getAccuracy()* 100) > parAccuracy)
+        {
+            timeTextpassFail.text = "Fail";
+            accurTextpassFail.text = "Pass";
+            scoreTextpassFail.text = "Pass";
+            clearText.text = "Track Failed";
+        }
+        else if(endTime < parTime && (myPlayer.getAccuracy()* 100) < parAccuracy)
+        {
+            timeTextpassFail.text = "Pass";
+            accurTextpassFail.text = "Fail";
+            scoreTextpassFail.text = "Pass";
+            clearText.text = "Track Failed";
+        }
+        else
+        {
+            timeTextpassFail.text = "Fail";
+            accurTextpassFail.text = "Fail";
+            scoreTextpassFail.text = "Pass";
+            clearText.text = "Track Failed";
+        }
     }
 }

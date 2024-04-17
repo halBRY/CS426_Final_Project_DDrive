@@ -12,6 +12,7 @@ public class AccuracyManager : MonoBehaviour
     private Color missColor = new Color32(255,26,0,255);
     private Color earlyColor = new Color32(60,220,30,255);
     private Color lateColor = new Color32(220,135,30,255);
+    private Color perfectColor = new Color32(183, 255, 255, 255);
 
     private const float TEXTFADEFLOAT = 1;
     private float textFadeTime;
@@ -54,11 +55,14 @@ public class AccuracyManager : MonoBehaviour
     public void Perfect()
     {
         combo++;
-        hitTypeText.text = "";
-        noteScoreText.text = "";
+        hitTypeText.color = perfectColor;
+        noteScoreText.color = perfectColor;
+        hitTypeText.text = "Perfect";
+        noteScoreText.text = "300";
         score += 300 * combo;
         accuracyText.text = score.ToString();
         comboText.text = "x" + combo.ToString();
+        textFadeTime = TEXTFADEFLOAT;
     }
     public void Early()
     {
