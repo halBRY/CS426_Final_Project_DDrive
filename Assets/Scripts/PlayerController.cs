@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
     private PlayerInput playerInput;
     public GameObject boonModel;
 
+    public bool pitchCorrect = false;
+
     public TrackTime trackTime;
     
     private Vector3 playerVelocity;
@@ -20,6 +22,7 @@ public class PlayerController : MonoBehaviour
     private bool groundedPlayer;
 
     private float playerSpeed = 20.0f;
+    private float playerSpeedMax = 22.0f;
     private float playerAccel = 1f;
     private float playerSpeedDynamic = 0f;
     private float playerSpeedStatic;
@@ -138,6 +141,7 @@ public class PlayerController : MonoBehaviour
         {
             boonActive = false;
             boonModel.SetActive(false);
+            trackBoonTime = true;
         }
 
         attemptHit = false;
@@ -241,13 +245,17 @@ public class PlayerController : MonoBehaviour
         {
             playerSpeed = playerSpeedStatic * 0.75f;
         }
+        else if(accuracy > .95)
+        {
+            playerSpeed = playerSpeedMax;
+        }
         else
         {
             playerSpeed = playerSpeedStatic;
         }
 
         //Calculate player speed
-         speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
+        speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
         lastPos = transform.position;
         lastRot = transform.rotation.y;
 
@@ -266,13 +274,17 @@ public class PlayerController : MonoBehaviour
         float newPitch = speed/playerSpeedStatic;
 
         //Add pitch modifier
-        if(newPitch > .9)
+        if(newPitch > .9 && newPitch <= 1)
         {
             newPitch = 1f;
         }
 
         audioSource.pitch = newPitch; 
-        pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
+        if(pitchCorrect)
+        {
+            pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
+        }
+    
 
         //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
         speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
