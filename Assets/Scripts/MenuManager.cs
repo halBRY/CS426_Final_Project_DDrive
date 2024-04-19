@@ -162,7 +162,13 @@ public class MenuManager : MonoBehaviour
     public void ResetGameScene()
     {
         //Move player to start
+        Player.GetComponent<CharacterController>().enabled = false;
+
         Player.transform.position = Player.startingLocation.position;
+        Debug.Log("Moving player to " + Player.startingLocation.position);
+
+        Player.lastPos = Player.startingLocation.position;
+        Player.GetComponent<CharacterController>().enabled = true;
 
         //Reset accuracy to 100
         Player.SetAccuracy(1f);
