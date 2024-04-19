@@ -175,6 +175,7 @@ public class MenuManager : MonoBehaviour
 
         //Reset scoring
         accuracyManager.score = 0;
-        accuracyManager.combo = 0;
+        accuracyManager.UpdateScoreText();
+        accuracyManager.ResetCombo();
     }
 }

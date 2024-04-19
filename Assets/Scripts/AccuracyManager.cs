@@ -42,6 +42,11 @@ public class AccuracyManager : MonoBehaviour
         }   
     }
 
+    public void UpdateScoreText()
+    {
+        accuracyText.text = score.ToString();
+    }
+
     // How scoring will add and combos
     public void HoldNote()
     {
