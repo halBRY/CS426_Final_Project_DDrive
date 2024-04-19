@@ -17,8 +17,8 @@ public class AccuracyManager : MonoBehaviour
     private const float TEXTFADEFLOAT = 1;
     private float textFadeTime;
     public float hits;
-    uint score;
-    uint combo; 
+    public uint score;
+    public uint combo; 
 
     void Start()
     {

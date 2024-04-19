@@ -6,20 +6,11 @@ using TMPro;
 
 public class TrackTime : MonoBehaviour
 {
-    public Button startButton;
-    public GameObject backButton;
-    public Button controlButton;
-    public Button creditsButton;
-
     public PlayerController myPlayer;
     public AccuracyManager accuracyManager;
 
-    public GameObject startGUI;
     public GameObject endGUI;
     public GameObject endPoint;
-    public GameObject mainMenuGUI;
-    public GameObject controlGUI;
-    public GameObject creditsGUI;
 
     public TMP_Text timeText;
     public TMP_Text accurText;
@@ -43,32 +34,7 @@ public class TrackTime : MonoBehaviour
     public void beginGame()
     {
         startTime = Time.time;
-        startGUI.SetActive(false);
         gameStarted = true;
-    }
-
-    public void showControls()
-    {
-        mainMenuGUI.SetActive(false);
-        backButton.SetActive(true);
-        controlGUI.SetActive(true);
-        creditsGUI.SetActive(false);
-    }
-
-    public void showCredits()
-    {
-        mainMenuGUI.SetActive(false);
-        backButton.SetActive(true);
-        controlGUI.SetActive(false);
-        creditsGUI.SetActive(true);
-    }
-
-    public void showMainMenu()
-    {
-        mainMenuGUI.SetActive(true);
-        backButton.SetActive(false);
-        controlGUI.SetActive(false);
-        creditsGUI.SetActive(false);
     }
 
     void Update()

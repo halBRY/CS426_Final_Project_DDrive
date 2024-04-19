@@ -7,6 +7,8 @@ public class audioSwitch : MonoBehaviour
     public AudioClip myTrack;
     public GameObject myPlayer;
 
+    public TrackTime trackTime;
+
     public bool isFinal = false;
 
     public void OnTriggerEnter(Collider other)
