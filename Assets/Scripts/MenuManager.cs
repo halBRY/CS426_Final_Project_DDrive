@@ -8,6 +8,7 @@ public class MenuManager : MonoBehaviour
     public GameObject MainMenu;
     public GameObject DemoPauseMenu;
     public GameObject GamePauseMenu;
+    public GameObject MissionMenu;
     public GameObject ControlsMenu;
     public GameObject CreditsMenu;
 
@@ -44,6 +45,14 @@ public class MenuManager : MonoBehaviour
             GamePauseMenu.SetActive(true);
         }
         Player.LockControls();
+    }
+
+    public void showMissionMenu()
+    {
+        HideAllMenu();
+        HideGameUI();
+
+        MissionMenu.SetActive(true);
     }
 
     public void ShowControlsMenu()
@@ -95,6 +104,7 @@ public class MenuManager : MonoBehaviour
         MainMenu.SetActive(false);
         DemoPauseMenu.SetActive(false);
         GamePauseMenu.SetActive(false);
+        MissionMenu.SetActive(false);
         ControlsMenu.SetActive(false);
         CreditsMenu.SetActive(false);
     }
