@@ -8,6 +8,7 @@ public class TrackTime : MonoBehaviour
 {
     public PlayerController myPlayer;
     public AccuracyManager accuracyManager;
+    public MenuManager menuManager;
 
     public GameObject endGUI;
     public GameObject endPoint;
@@ -28,8 +29,14 @@ public class TrackTime : MonoBehaviour
 
     public bool gameStarted = false;
 
-    public float parTime = 240f;
+    public float parTime = 275f;
     public float parAccuracy = 50f;
+    public uint parScore = 2000000;
+
+    public bool trackCleared = true;
+
+    public Color clear;
+    public Color fail;
 
     public void beginGame()
     {
@@ -53,6 +60,7 @@ public class TrackTime : MonoBehaviour
     public void endGame()
     {
         gameStarted = false;
+        menuManager.gameStarted = false;
         endGUI.SetActive(true);
         endTime = currentTime;
 
@@ -63,33 +71,48 @@ public class TrackTime : MonoBehaviour
         accurText.text = string.Format("{0:#.00}%", (myPlayer.getAccuracy()* 100));
         scoreText.text = accuracyManager.getScore().ToString();
 
-        if(endTime < parTime && (myPlayer.getAccuracy()* 100) > parAccuracy)
-        {
-            timeTextpassFail.text = "Pass";
-            accurTextpassFail.text = "Pass";
-            scoreTextpassFail.text = "Pass";
-            clearText.text = "Track Cleared";
-        }
-        else if(endTime > parTime && (myPlayer.getAccuracy()* 100) > parAccuracy)
+        myPlayer.LockControls();
+
+        Debug.Log("Hello");
+
+        timeTextpassFail.text = "Pass";
+        accurTextpassFail.text = "Pass";
+        scoreTextpassFail.text = "Pass";
+
+        timeTextpassFail.color = clear;
+        accurTextpassFail.color = clear;
+        scoreTextpassFail.color = clear;
+
+        if(endTime > parTime)
         {
             timeTextpassFail.text = "Fail";
-            accurTextpassFail.text = "Pass";
-            scoreTextpassFail.text = "Pass";
-            clearText.text = "Track Failed";
+            timeTextpassFail.color = fail;
+            trackCleared = false;
         }
-        else if(endTime < parTime && (myPlayer.getAccuracy()* 100) < parAccuracy)
+        
+        if(myPlayer.getAccuracy()* 100 < parAccuracy)
         {
-            timeTextpassFail.text = "Pass";
             accurTextpassFail.text = "Fail";
-            scoreTextpassFail.text = "Pass";
-            clearText.text = "Track Failed";
+            accurTextpassFail.color = fail;
+            trackCleared = false;
+        }
+
+        if(accuracyManager.getScore() < parScore)
+        {
+            scoreTextpassFail.text = "Fail";
+            scoreTextpassFail.color = fail;
+            trackCleared = false;
+        }
+
+        if(trackCleared)
+        {
+            clearText.text = "Track Cleared!";
+            clearText.color = clear;
         }
         else
         {
-            timeTextpassFail.text = "Fail";
-            accurTextpassFail.text = "Fail";
-            scoreTextpassFail.text = "Pass";
-            clearText.text = "Track Failed";
+            clearText.text = "Track Failed!";
+            clearText.color = fail;
         }
     }
 }

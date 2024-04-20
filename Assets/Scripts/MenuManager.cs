@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class MenuManager : MonoBehaviour
 {
@@ -172,6 +173,8 @@ public class MenuManager : MonoBehaviour
 
         //Reset accuracy to 100
         Player.SetAccuracy(1f);
+
+        Player.resetStartSound();
 
         //Reset scoring
         accuracyManager.score = 0;

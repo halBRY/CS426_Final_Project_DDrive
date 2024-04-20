@@ -25,8 +25,9 @@ public class audioSwitch : MonoBehaviour
         if(isFinal)
         {
             Debug.Log("Game is over");
-            GameObject trackTime = GameObject.FindWithTag("TrackTime");
-            trackTime.GetComponent<TrackTime>().endGame();
+            //GameObject trackTime = GameObject.FindWithTag("TrackTime");
+            //trackTime.GetComponent<TrackTime>().endGame();
+            trackTime.endGame();
         }
     }
 }

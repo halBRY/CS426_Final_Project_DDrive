@@ -93,6 +93,7 @@ public class PlayerController : MonoBehaviour
     //Misc.
     private Transform cameraTransform;
     public Transform startingLocation;
+    public Transform endingLocation;
 
     public GameObject bullet;
 
@@ -142,6 +143,16 @@ public class PlayerController : MonoBehaviour
                 GameObject myflag = Instantiate(bullet, gameObject.transform.position, gameObject.transform.rotation);
                 myflag.GetComponent<audioSwitch>().myPlayer = gameObject;
             }*/
+
+            //End screen debug utility
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.Log("Press");
+                gameObject.GetComponent<CharacterController>().enabled = false;
+                gameObject.transform.position = endingLocation.position;
+                gameObject.GetComponent<CharacterController>().enabled = true;
+
+            }
 
             // Enable boon for 4 seconds
             if(boonActive && trackBoonTime)
@@ -393,6 +404,12 @@ public class PlayerController : MonoBehaviour
 
     public void playHitSound(){
         hitSound.Play();
+    }
+
+    public void resetStartSound()
+    {
+        audioSource.clip = startSound;
+        audioSource.Play();
     }
 
     public void BoonActivate()
