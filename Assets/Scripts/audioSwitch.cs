@@ -7,6 +7,8 @@ public class audioSwitch : MonoBehaviour
     public AudioClip myTrack;
     public GameObject myPlayer;
 
+    public TrackTime trackTime;
+
     public bool isFinal = false;
 
     public void OnTriggerEnter(Collider other)
@@ -23,8 +25,9 @@ public class audioSwitch : MonoBehaviour
         if(isFinal)
         {
             Debug.Log("Game is over");
-            GameObject trackTime = GameObject.FindWithTag("TrackTime");
-            trackTime.GetComponent<TrackTime>().endGame();
+            //GameObject trackTime = GameObject.FindWithTag("TrackTime");
+            //trackTime.GetComponent<TrackTime>().endGame();
+            trackTime.endGame();
         }
     }
 }

@@ -6,11 +6,21 @@ public class HitNote : MonoBehaviour
 {
     public AccuracyManager accuracyManager;
     public PlayerController player;
-
     private bool canHit = false;
     private bool checkingForHits = true;
     private bool missedNote = false;
 
+    public bool isBoonHit;
+    
+    private Color emissionColor = Color.blue;
+
+    private Material material;
+
+
+    void Start()
+    {
+        material = GetComponent<Renderer>().material;
+    }
 
     // Each fram checks if player is in trigger, if so check player is pressing hit button
     void Update()
@@ -19,30 +29,50 @@ public class HitNote : MonoBehaviour
         {
             if(player.getAttemptHit())
             {
-                // Supposed to add early and late hits. But was buggy so only the center one exist
-                if(gameObject.tag == "HitCenter")
+                player.playHitSound();
+                if(isBoonHit)
                 {
-                    Debug.Log("hit perfect");
-                    accuracyManager.Perfect();
-                    Destroy(transform.parent.gameObject);
-                    player.addHit();
-                    canHit = false;
+                    player.BoonActivate();
                 }
-                else if(gameObject.tag == "HitEarly")
+                // Early and late hits
+                // Updated to add early/late immunity boon
+                if(player.boonActive)
                 {
-                    Debug.Log("hit early");
-                    accuracyManager.Early();
-                    Destroy(transform.parent.gameObject);
-                    player.addHalfHit();
-                    canHit = false;
+                    if(gameObject.tag == "HitCenter" || gameObject.tag == "HitEarly" || gameObject.tag == "HitLate")
+                    {
+                        Debug.Log("hit perfect");
+                        accuracyManager.Perfect();
+                        Destroy(transform.parent.gameObject);
+                        player.addHit();
+                        canHit = false;
+                    }  
                 }
-                else if(gameObject.tag == "HitLate")
+                else
                 {
-                    Debug.Log("hit late");
-                    accuracyManager.Late();
-                    Destroy(transform.parent.gameObject);
-                    player.addHalfHit();
-                    canHit = false;
+                    if(gameObject.tag == "HitCenter")
+                    {
+                        Debug.Log("hit perfect");
+                        accuracyManager.Perfect();
+                        Destroy(transform.parent.gameObject);
+                        player.addHit();
+                        canHit = false;
+                    }
+                    else if(gameObject.tag == "HitEarly")
+                    {
+                        Debug.Log("hit early");
+                        accuracyManager.Early();
+                        Destroy(transform.parent.gameObject);
+                        player.addHalfHit();
+                        canHit = false;
+                    }
+                    else if(gameObject.tag == "HitLate")
+                    {
+                        Debug.Log("hit late");
+                        accuracyManager.Late();
+                        Destroy(transform.parent.gameObject);
+                        player.addHalfHit();
+                        canHit = false;
+                    }
                 }
             }
             checkingForHits = false;
@@ -55,12 +85,17 @@ public class HitNote : MonoBehaviour
 
     void OnTriggerEnter (Collider collider)
     {
+        if (gameObject.tag == "HitCenter")
+        {
+            SetEmissionColor(emissionColor);
+        }
         canHit = true;
         Debug.Log("can hit");
     }
 
     void OnTriggerExit(Collider collider)
     {
+        SetEmissionColor(Color.black);
         // In if to prevent a note being counted twice if missed
         if(!missedNote && gameObject.tag == "HitLate")
         {
@@ -78,6 +113,12 @@ public class HitNote : MonoBehaviour
 
         }
     }
-    
 
+    private void SetEmissionColor(Color color)
+    {
+        // Set the emission color of the material
+        material.SetColor("_EmissionColor", color);
+        // Activate emission
+        material.EnableKeyword("_EMISSION");
+    }
 }

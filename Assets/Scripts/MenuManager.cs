@@ -1,0 +1,197 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+
+public class MenuManager : MonoBehaviour
+{
+    public GameObject MainMenu;
+    public GameObject DemoPauseMenu;
+    public GameObject GamePauseMenu;
+    public GameObject MissionMenu;
+    public GameObject ControlsMenu;
+    public GameObject CreditsMenu;
+
+    public GameObject DemoButton;
+
+    public GameObject GameScene;
+    public GameObject DemoScene;
+
+    public GameObject GameUI;
+
+    public PlayerController Player;
+    public AccuracyManager accuracyManager;
+    public TrackTime trackTime;
+
+    public bool gameStarted = false;
+
+    public void ShowMainMenu()
+    {
+        Player.isDemo = true;
+        HideAllMenu();
+        MainMenu.SetActive(true);
+    }
+
+    public void ShowPauseMenu(bool isDemo)
+    {
+        HideAllMenu();
+        HideGameUI();
+        if(isDemo == true)
+        {
+            DemoPauseMenu.SetActive(true);
+        }
+        else if(isDemo == false)
+        {
+            GamePauseMenu.SetActive(true);
+        }
+        Player.LockControls();
+    }
+
+    public void showMissionMenu()
+    {
+        HideAllMenu();
+        HideGameUI();
+
+        MissionMenu.SetActive(true);
+    }
+
+    public void ShowControlsMenu()
+    {
+        HideGameUI();
+        HideAllMenu();
+        ControlsMenu.SetActive(true);
+        if(Player.isDemo)
+        {
+            if(Player.pauseActive)
+            {
+                DemoButton.SetActive(false);
+            }
+            else
+            {
+                DemoButton.SetActive(true);
+            }
+        }
+        else
+        {
+            DemoButton.SetActive(false);
+        }
+    }
+
+    public void ShowCredits()
+    {
+        HideGameUI();
+        HideAllMenu();
+        CreditsMenu.SetActive(true);
+    }
+
+    public void StartControlDemo()
+    {
+        ShowGameUI();
+        Player.overheadCamera.orthographicSize = 65f;
+        Player.UnlockControls();
+        HideAllMenu();
+    }
+
+    public void StopControlDemo()
+    {
+        ShowMainMenu();
+        HideGameUI();
+        Player.LockControls();
+    }
+
+    public void HideAllMenu()
+    {
+        MainMenu.SetActive(false);
+        DemoPauseMenu.SetActive(false);
+        GamePauseMenu.SetActive(false);
+        MissionMenu.SetActive(false);
+        ControlsMenu.SetActive(false);
+        CreditsMenu.SetActive(false);
+    }
+
+    public void StartGame()
+    {
+        ResetGameScene();
+
+        Player.overheadCamera.orthographicSize = 260f;
+        
+        gameStarted = true;
+        trackTime.beginGame();
+        
+        Player.isDemo = false;
+
+        DemoScene.SetActive(false);
+        GameScene.SetActive(true);
+
+        Player.UnlockControls();
+        HideAllMenu();
+        ShowGameUI();
+    }
+
+    public void PauseOff()
+    {
+        ShowGameUI();
+        Player.pauseActive = false;
+    }
+
+    public void BackButton()
+    {
+        HideAllMenu();
+        if(Player.pauseActive)
+        {
+            if(Player.isDemo)
+            {
+                DemoPauseMenu.SetActive(true);
+            }
+            else
+            {
+                GamePauseMenu.SetActive(true);
+            }
+        }
+        else
+        {
+            ShowMainMenu();
+        }
+    }
+
+    public void ShowGameUI()
+    {
+        GameUI.SetActive(true);
+    }
+
+    public void HideGameUI()
+    {
+        GameUI.SetActive(false);
+    }
+    public void ResetForDemo()
+    {
+        ResetGameScene();
+        gameStarted = false;
+        Player.isDemo = true;
+
+        DemoScene.SetActive(true);
+        GameScene.SetActive(false);
+    }
+
+    public void ResetGameScene()
+    {
+        //Move player to start
+        Player.GetComponent<CharacterController>().enabled = false;
+
+        Player.transform.position = Player.startingLocation.position;
+        Debug.Log("Moving player to " + Player.startingLocation.position);
+
+        Player.lastPos = Player.startingLocation.position;
+        Player.GetComponent<CharacterController>().enabled = true;
+
+        //Reset accuracy to 100
+        Player.SetAccuracy(1f);
+
+        Player.resetStartSound();
+
+        //Reset scoring
+        accuracyManager.score = 0;
+        accuracyManager.UpdateScoreText();
+        accuracyManager.ResetCombo();
+    }
+}

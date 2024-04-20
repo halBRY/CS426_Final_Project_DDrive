@@ -8,59 +8,90 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {   
+    //Player Objects
     public Camera camera;
+    public Camera overheadCamera;
     private CharacterController controller;
     private PlayerInput playerInput;
+    public GameObject boonModel;
+    public int myID = 0;
+    public GameObject thirdPersonCamera;
 
+    //User Option
+    public bool pitchCorrect = false;
+
+    //Timer Manager
     public TrackTime trackTime;
     
+    //Player Control variables
     private Vector3 playerVelocity;
-    
     private bool groundedPlayer;
-
+    private bool lockControls = true;
     private float playerSpeed = 20.0f;
+    private float playerSpeedMax = 22.0f;
+    private float playerAccel = 1f;
+    private float playerSpeedDynamic = 0f;
     private float playerSpeedStatic;
     private float jumpHeight = 0.0f;
     private float gravityValue = -9.81f;
 
-    private float accuracy;
+    private bool isDriving = false;
+    private Vector3 lastDriveMove;
 
+    //Input Actions
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction hitAction;
+    private InputAction pauseAction;
 
-    private bool attemptHit; // For the note to know the hit button was pressed
-    public bool hitEnabled = true;
+    [SerializeField] private InputActionReference hitHold;
 
+    private void OnEnable()
+    {
+        hitHold.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        hitHold.action.Disable();
+    }
+
+    //Power-up variables
+    public bool boonActive;
+    public bool trackBoonTime;
+    public float boonStartTime;
+    public float boonEndTime;
+
+    //Note System variables
     public AccuracyManager accuracyManager;
     public float passedHits = 0f;
+    private bool attemptHit; // For the note to know the hit button was pressed
+    private bool attemptHold;
+    public bool hitEnabled = true;
 
-    private Transform cameraTransform;
+    private float accuracy;
 
-    public Transform startingLocation;
-
-    public GameObject cannon;
-    public GameObject bullet;
-
-    public Animator anim;
-
+    //Audio Editing variables
     public AudioSource audioSource;
     public AudioSource carSounds;
+    public AudioSource hitSound;
 
     public AudioClip startSound;
 
+    //Animation variables
+    public Animator anim;
     public Vector3 lastPos;
     public float lastRot;
 
-    public int myID = 0;
-
+    //UI variables
     public TMP_Text speedText;
     public TMP_Text justSpeed;
 
     public float textFadeTime;
-    private float speedMod;
 
-     //SPEEDOMETER
+    public MenuManager menuManager;
+
+    //SPEEDOMETER
     public Texture2D backTex;
 	public Texture2D dialTex;
 	public Texture2D needleTex;
@@ -73,20 +104,44 @@ public class PlayerController : MonoBehaviour
 	public float topSpeedAngle=31;
     public float speed;
 
+    //Misc.
+    private Transform cameraTransform;
+    public Transform startingLocation;
+    public Transform endingLocation;
+
+    public GameObject bullet;
+
+    public bool pauseActive = false;
+    public bool isDemo = true;
+
     private void Start()
     {
+        hitHold.action.started += context => {
+            attemptHold = true;
+            Debug.Log("Started hold");
+        };
+        hitHold.action.performed += context => {
+            Debug.Log("Started performed");
+        };
+        hitHold.action.canceled += context => {
+            attemptHold = false;
+            Debug.Log("Started canceled");
+        };
+
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
         anim = GetComponentInChildren<Animator>();
 
         attemptHit = false;
+        attemptHold = false;
 
         cameraTransform = camera.transform;
 
         moveAction = playerInput.actions["Move"];
         jumpAction = playerInput.actions["Jump"];
         hitAction = playerInput.actions["Hit"];
+        pauseAction = playerInput.actions["Pause"];
 
         audioSource = GetComponent<AudioSource>();
 
@@ -97,138 +152,255 @@ public class PlayerController : MonoBehaviour
         
         accuracy = 1;
 
-        speedMod = 1f;
+        trackBoonTime = true;
+
+        LockControls();
     }
 
     void Update()
     {   
-        if(trackTime.gameStarted)
+        if(!lockControls)
         {
             Cursor.lockState = CursorLockMode.Locked;
-        }
 
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            GameObject myflag = Instantiate(bullet, gameObject.transform.position, gameObject.transform.rotation);
-            myflag.GetComponent<audioSwitch>().myPlayer = gameObject;
-        }
+            //Map Building Tool
+            /*
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                GameObject myflag = Instantiate(bullet, gameObject.transform.position, gameObject.transform.rotation);
+                myflag.GetComponent<audioSwitch>().myPlayer = gameObject;
+            }*/
 
-        attemptHit = false;
+            //End screen debug utility
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.Log("Press");
+                gameObject.GetComponent<CharacterController>().enabled = false;
+                gameObject.transform.position = endingLocation.position;
+                gameObject.GetComponent<CharacterController>().enabled = true;
 
-        groundedPlayer = controller.isGrounded;
-        if (groundedPlayer && playerVelocity.y < 0)
-        {
-            playerVelocity.y = 0f;
-        }
+            }
 
-        Vector2 input = moveAction.ReadValue<Vector2>();
-        Vector3 move = new Vector3(input.x, 0, input.y);
+            // Enable boon for 4 seconds
+            if(boonActive && trackBoonTime)
+            {
+                boonStartTime = Time.time;
+                boonEndTime = Time.time + 10f; //wait 5 seconds
+                trackBoonTime = false;
+            }
 
-        //Macanim
-        /*
-        if(lastRot > transform.rotation.y)
-        {
-            anim.SetTrigger("TurningLeft");
-        }
+            //Deactivate boon
+            if(boonActive && Time.time > boonEndTime)
+            {
+                boonActive = false;
+                boonModel.SetActive(false);
+                trackBoonTime = true;
+            }
 
-        if(lastRot < transform.rotation.y)
-        {
-            anim.SetTrigger("TurningRight");
-        }
+            attemptHit = false;
 
-        if(Input.GetKeyDown(KeyCode.N))
-        {
-            anim.SetTrigger("Shake");
-        }
+            groundedPlayer = controller.isGrounded;
+            if (groundedPlayer && playerVelocity.y < 0)
+            {
+                playerVelocity.y = 0f;
+            }
 
-        if(Vector3.Distance(transform.position, lastPos) / Time.deltaTime > 0)
-        {
-            anim.SetTrigger("Drive");
-        }*/
+            Vector2 input = moveAction.ReadValue<Vector2>();
+            Vector3 move = new Vector3(input.x, 0, input.y);
 
-        move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
-        move.y = 0.0f;
+            //Macanim
+            /*
+            if(lastRot > transform.rotation.y)
+            {
+                anim.SetTrigger("TurningLeft");
+            }
 
-        controller.Move(move * Time.deltaTime * playerSpeed);
+            if(lastRot < transform.rotation.y)
+            {
+                anim.SetTrigger("TurningRight");
+            }
 
-        // Changes the height position of the player..
-        if (jumpAction.triggered && groundedPlayer)
-        {
-            playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
-        }
+            if(Input.GetKeyDown(KeyCode.N))
+            {
+                anim.SetTrigger("Shake");
+            }
 
-        playerVelocity.y += gravityValue * Time.deltaTime;
-        controller.Move(playerVelocity * Time.deltaTime);
+            if(Vector3.Distance(transform.position, lastPos) / Time.deltaTime > 0)
+            {
+                anim.SetTrigger("Drive");
+            }*/
 
-        // Rotate model towards camera look
-        Quaternion playerRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
-        transform.rotation = Quaternion.Slerp(transform.rotation, playerRotation, 5f * Time.deltaTime);
+            move = move.x * cameraTransform.right.normalized + move.z * cameraTransform.forward.normalized;
+            move.y = 0.0f;
 
-        if(hitAction.triggered && hitEnabled == true)
-        {
-            attemptHit = true;
-        }
+            moveAction.performed += speedUp;
+            moveAction.canceled += speedDown;
 
-        if(Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
+            //Acceleration and deceleration
+            if(isDriving)
+            {
+                if(playerSpeedDynamic < playerSpeed)
+                {
+                    playerSpeedDynamic += playerAccel;
+                }
+                else if(playerSpeedDynamic >= playerSpeed)
+                {
+                    playerSpeedDynamic = playerSpeed;
+                }
 
-        //Get Audio Mixer
-        var pitchBendGroup = Resources.Load<UnityEngine.Audio.AudioMixerGroup>("MyAudioMixer"); 
-        audioSource.outputAudioMixerGroup = pitchBendGroup;
+                lastDriveMove = move;
+                controller.Move(move * Time.deltaTime * playerSpeedDynamic);
+            }
+            else
+            {
+                if(playerSpeedDynamic <= 0)
+                {
+                    playerSpeedDynamic = 0;
+                }
+                else
+                {
+                    playerSpeedDynamic -= playerAccel;
+                }
+                controller.Move(lastDriveMove * Time.deltaTime * playerSpeedDynamic);
+            }
 
-        if(accuracy < .5)
-        {
-            playerSpeed = playerSpeedStatic * 0.75f;
+            // Changes the height position of the player..
+            if (jumpAction.triggered && groundedPlayer)
+            {
+                playerVelocity.y += Mathf.Sqrt(jumpHeight * -3.0f * gravityValue);
+            }
+
+            playerVelocity.y += gravityValue * Time.deltaTime;
+            controller.Move(playerVelocity * Time.deltaTime);
+
+            // Rotate model towards camera look
+            Quaternion playerRotation = Quaternion.Euler(0, cameraTransform.eulerAngles.y, 0);
+            transform.rotation = Quaternion.Slerp(transform.rotation, playerRotation, 5f * Time.deltaTime);
+
+            if(hitAction.triggered && hitEnabled == true)
+            {
+                attemptHit = true;
+            }
+
+            if(pauseAction.triggered)
+            {
+                pauseActive = !pauseActive;
+                if(pauseActive)
+                {
+                   menuManager.ShowPauseMenu(isDemo); 
+                }
+                else if(!pauseActive)
+                {
+                    menuManager.HideAllMenu();
+                    menuManager.ShowGameUI();
+                    UnlockControls();
+                }
+            }
+
+            if(Input.GetKeyDown(KeyCode.Escape))
+            {
+                Application.Quit();
+            }
+
+            //Get Audio Mixer
+            var pitchBendGroup = Resources.Load<UnityEngine.Audio.AudioMixerGroup>("MyAudioMixer"); 
+            audioSource.outputAudioMixerGroup = pitchBendGroup;
+
+            if(accuracy < .5)
+            {
+                playerSpeed = playerSpeedStatic * 0.75f;
+            }
+            else if(accuracy > .95)
+            {
+                playerSpeed = playerSpeedMax;
+            }
+            else
+            {
+                playerSpeed = playerSpeedStatic;
+            }
+
+            //Calculate player speed
+            speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
+            lastPos = transform.position;
+            lastRot = transform.rotation.y;
+
+            justSpeed.text = string.Format("{0:#.00}", speed);
+
+            if(speed == 0)
+            {
+                carSounds.volume = 0.1f;
+            }
+            else
+            {
+                carSounds.volume = 0f;
+            }
+
+            //Normalize speed 
+            float newPitch = speed/playerSpeedStatic;
+
+            //Add pitch modifier
+            if(newPitch > .9 && newPitch <= 1)
+            {
+                newPitch = 1f;
+            }
+
+            audioSource.pitch = newPitch; 
+            if(pitchCorrect)
+            {
+                pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
+            }
+
+            //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
+            speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
+            trackTime.UpdateAccurBar(accuracy);
+            trackTime.UpdateScoreBar(accuracyManager.getScore());
+
+            //Reset if fall off edge
+            if(gameObject.transform.position.y <= -30)
+            {
+                gameObject.transform.position = startingLocation.position;
+                audioSource.clip = startSound;
+                audioSource.Play();
+            }
         }
         else
         {
-            playerSpeed = playerSpeedStatic;
+            if(pauseAction.triggered)
+            {
+                pauseActive = !pauseActive;
+                if(pauseActive)
+                {
+                   menuManager.ShowPauseMenu(isDemo); 
+                }
+                else if(!pauseActive)
+                {
+                    menuManager.HideAllMenu();
+                    menuManager.ShowGameUI();
+                    UnlockControls();
+                }
+            }
+            Cursor.lockState = CursorLockMode.None;
         }
+    }
+    
+    void speedUp(InputAction.CallbackContext obj)
+    {
+        isDriving = true;
+    }
 
-        //Calculate player speed
-         speed = Vector3.Distance(transform.position, lastPos) / Time.deltaTime;
-        lastPos = transform.position;
-        lastRot = transform.rotation.y;
-
-        justSpeed.text = string.Format("{0:#.00}", speed);
-
-        if(speed == 0)
-        {
-            carSounds.volume = 0.1f;
-        }
-        else
-        {
-            carSounds.volume = 0f;
-        }
-
-        //Normalize speed 
-        float newPitch = speed/playerSpeedStatic;
-
-        //Add pitch modifier
-        if(newPitch > .9)
-        {
-            newPitch = 1f;
-        }
-
-        audioSource.pitch = newPitch; 
-        pitchBendGroup.audioMixer.SetFloat("ExpoPitch", 1f / newPitch);
-
-        //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
-        speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
-
-        if(gameObject.transform.position.y <= -30)
-        {
-            gameObject.transform.position = new Vector3(1.06f, 1.06f, -45.1f);
-            audioSource.clip = startSound;
-            audioSource.Play();
-        }
+    void speedDown(InputAction.CallbackContext obj)
+    {
+        isDriving = false;
     }
 
     public bool getAttemptHit()
     {
         return attemptHit;
+    }
+
+    public bool getAttemptHold()
+    {
+        return attemptHold;
     }
 
     public void addHit()
@@ -237,7 +409,7 @@ public class PlayerController : MonoBehaviour
         passedHits += 1;
         accuracy = accuracyManager.hits/passedHits;
     }
-        public void addHalfHit()
+    public void addHalfHit()
     {
         accuracyManager.hits += 0.5f;
         passedHits += 1;
@@ -254,9 +426,43 @@ public class PlayerController : MonoBehaviour
         return accuracy;
     }
 
+    public void SetAccuracy(float newAccur)
+    {
+        accuracy = newAccur;
+    }
+
     public int getID()
     {
         return myID;
+    }
+
+    public void playHitSound(){
+        hitSound.Play();
+    }
+
+    public void resetStartSound()
+    {
+        audioSource.clip = startSound;
+        audioSource.Play();
+    }
+
+    public void BoonActivate()
+    {
+        boonActive = true;
+        boonModel.SetActive(true);
+    }
+
+    public void LockControls()
+    {
+        lockControls = true;
+        thirdPersonCamera.SetActive(false);
+    }
+
+    public void UnlockControls()
+    {
+        lockControls = false;
+        thirdPersonCamera.SetActive(true);
+
     }
 
     void OnTriggerEnter(Collider other)
@@ -264,30 +470,35 @@ public class PlayerController : MonoBehaviour
         //Debug.Log("Collision Detected");
         //Debug.Log(other.gameObject.tag);
     }
-    void  OnGUI (){
+    
+    void OnGUI (){
 
-		// Draw the back
-		GUI.DrawTexture( new Rect(counterPos.x, counterPos.y, counterSize.x, counterSize.y), backTex);
+        if(menuManager.gameStarted && !pauseActive)
+        {
+            // Draw the back
+            GUI.DrawTexture( new Rect(counterPos.x, counterPos.y, counterSize.x, counterSize.y), backTex);
 
-		// Draw the counter
-		GUI.DrawTexture( new Rect(counterPos.x+15, counterPos.y+15, counterSize.x-30, counterSize.y-30), dialTex);
+            // Draw the counter
+            GUI.DrawTexture( new Rect(counterPos.x+15, counterPos.y+15, counterSize.x-30, counterSize.y-30), dialTex);
 
-		// Calculate center
-		Vector2 centre= new Vector2(counterPos.x + (counterSize.x / 2), counterPos.y + (counterSize.y / 2) );
-		Matrix4x4 savedMatrix= GUI.matrix;
+            // Calculate center
+            Vector2 centre= new Vector2(counterPos.x + (counterSize.x / 2), counterPos.y + (counterSize.y / 2) );
+            Matrix4x4 savedMatrix= GUI.matrix;
 
-		// Calculate angle
-		float speedFraction= speed / topSpeed;
-		float needleAngle= Mathf.Lerp(stopAngle, topSpeedAngle, speedFraction);
+            // Calculate angle
+            speed = speed *2;
+            float speedFraction= speed / topSpeed;
+            float needleAngle= Mathf.Lerp(stopAngle, topSpeedAngle, speedFraction);
 
-		GUIUtility.RotateAroundPivot(needleAngle, centre);
+            GUIUtility.RotateAroundPivot(needleAngle, centre);
 
-		// Draw the needle
-		GUI.DrawTexture( new Rect(centre.x+5, (centre.y+10) - needleTex.height / 2, needleTex.width/needleSizeRatio, needleTex.height/needleSizeRatio), needleTex);
-		GUI.matrix = savedMatrix;
+            // Draw the needle
+            GUI.DrawTexture( new Rect(centre.x+5, (centre.y+10) - needleTex.height / 2, needleTex.width/needleSizeRatio, needleTex.height/needleSizeRatio), needleTex);
+            GUI.matrix = savedMatrix;
 
-		// Draw the needle cache
-		GUI.DrawTexture( new Rect(centre.x-30, centre.y-30, 60, 60), needleCache);
+            // Draw the needle cache
+            GUI.DrawTexture( new Rect(centre.x-30, centre.y-30, 60, 60), needleCache);
+        }
 	}
 
 }

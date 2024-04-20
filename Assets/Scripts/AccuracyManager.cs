@@ -4,7 +4,6 @@ using TMPro;
 
 public class AccuracyManager : MonoBehaviour
 {
-    // Start is called before the first frame update
     public TMP_Text accuracyText;
     public TMP_Text comboText;
     public TMP_Text hitTypeText;
@@ -13,12 +12,14 @@ public class AccuracyManager : MonoBehaviour
     private Color missColor = new Color32(255,26,0,255);
     private Color earlyColor = new Color32(60,220,30,255);
     private Color lateColor = new Color32(220,135,30,255);
+    private Color perfectColor = new Color32(183, 255, 255, 255);
 
     private const float TEXTFADEFLOAT = 1;
     private float textFadeTime;
     public float hits;
-    uint score;
-    uint combo; 
+    public uint score;
+    public uint combo; 
+
     void Start()
     {
         score = 0;
@@ -41,15 +42,32 @@ public class AccuracyManager : MonoBehaviour
         }   
     }
 
+    public void UpdateScoreText()
+    {
+        accuracyText.text = score.ToString();
+    }
+
     // How scoring will add and combos
-    public void Perfect()
+    public void HoldNote()
     {
         combo++;
         hitTypeText.text = "";
         noteScoreText.text = "";
+        score += 100 * combo;
+        accuracyText.text = score.ToString();
+        comboText.text = "x" + combo.ToString();
+    }
+    public void Perfect()
+    {
+        combo++;
+        hitTypeText.color = perfectColor;
+        noteScoreText.color = perfectColor;
+        hitTypeText.text = "Perfect";
+        noteScoreText.text = "300";
         score += 300 * combo;
         accuracyText.text = score.ToString();
         comboText.text = "x" + combo.ToString();
+        textFadeTime = TEXTFADEFLOAT;
     }
     public void Early()
     {

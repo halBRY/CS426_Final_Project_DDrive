@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class CheckPointsManager : MonoBehaviour
 {
-
     private List<Checkpoint> myCheckpoints;
     
     public List<bool> myCheckpointFirstArrivalFlags;
@@ -38,6 +37,7 @@ public class CheckPointsManager : MonoBehaviour
 
         driversLastPoint = new int[numDrivers];
         progressBar.maxValue = myCheckpoints.Count;
+        Debug.Log("There are " + myCheckpoints.Count.ToString() + " checkpoints");
     }
 
     private void Update()
