@@ -44,6 +44,18 @@ public class PlayerController : MonoBehaviour
     private InputAction hitAction;
     private InputAction pauseAction;
 
+    [SerializeField] private InputActionReference hitHold;
+
+    private void OnEnable()
+    {
+        hitHold.action.Enable();
+    }
+
+    private void OnDisable()
+    {
+        hitHold.action.Disable();
+    }
+
     //Power-up variables
     public bool boonActive;
     public bool trackBoonTime;
@@ -54,6 +66,7 @@ public class PlayerController : MonoBehaviour
     public AccuracyManager accuracyManager;
     public float passedHits = 0f;
     private bool attemptHit; // For the note to know the hit button was pressed
+    private bool attemptHold;
     public bool hitEnabled = true;
 
     private float accuracy;
@@ -103,12 +116,25 @@ public class PlayerController : MonoBehaviour
 
     private void Start()
     {
+        hitHold.action.started += context => {
+            attemptHold = true;
+            Debug.Log("Started hold");
+        };
+        hitHold.action.performed += context => {
+            Debug.Log("Started performed");
+        };
+        hitHold.action.canceled += context => {
+            attemptHold = false;
+            Debug.Log("Started canceled");
+        };
+
         controller = GetComponent<CharacterController>();
         playerInput = GetComponent<PlayerInput>();
 
         anim = GetComponentInChildren<Animator>();
 
         attemptHit = false;
+        attemptHold = false;
 
         cameraTransform = camera.transform;
 
@@ -370,6 +396,11 @@ public class PlayerController : MonoBehaviour
     public bool getAttemptHit()
     {
         return attemptHit;
+    }
+
+    public bool getAttemptHold()
+    {
+        return attemptHold;
     }
 
     public void addHit()

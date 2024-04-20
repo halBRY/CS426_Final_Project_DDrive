@@ -9,6 +9,7 @@ public class HoldNote : MonoBehaviour
     public HoldNote startHold;
 
     private bool canHit = false;
+    private bool holding = false;
     private bool missedNote = false;
     // Start is called before the first frame update
     private bool hitStart;
@@ -37,10 +38,23 @@ public class HoldNote : MonoBehaviour
                 hitStart = true;
                 canHit = false;
             }
-        }
-        else if (hitStart && !canHit)
-        {
-            Debug.Log("add a way to keep track of player holding keydown");
+            else if (getStart() && player.getAttemptHold())
+            {
+                if(gameObject.tag == "HoldEnd")
+                {
+                    Debug.Log("Hold hit end");
+                    accuracyManager.HoldNote();
+                    player.addHit();
+                    Destroy(transform.parent.gameObject);
+                }
+                else if (gameObject.tag == "HoldCenter")
+                {
+                    Debug.Log("Hold hit center");
+                    accuracyManager.HoldNote();
+                    player.addHit();
+                    Destroy(gameObject);
+                }
+            }
         }
     }
 
@@ -54,17 +68,29 @@ public class HoldNote : MonoBehaviour
         }
         else if (getStart() && gameObject.tag == "HoldEnd")
         {
-                Debug.Log("Hold hit end");
-                accuracyManager.HoldNote();
-                player.addHit();
+            canHit = true;
+            if(!player.getAttemptHold())
+            {
+                missedNote = true;
                 Destroy(transform.parent.gameObject);
+                Debug.Log("missed note");
+                canHit = false;
+                accuracyManager.ResetCombo();
+                player.MissedHit();
+            }
         }
         else if (getStart() && gameObject.tag == "HoldCenter")
         {
-                Debug.Log("Hold hit center");
-                accuracyManager.HoldNote();
-                player.addHit();
-                Destroy(gameObject);
+            canHit = true;
+            if(!player.getAttemptHold())
+            {
+                missedNote = true;
+                Destroy(transform.parent.gameObject);
+                Debug.Log("missed note");
+                canHit = false;
+                accuracyManager.ResetCombo();
+                player.MissedHit();
+            }
         }
      
 
