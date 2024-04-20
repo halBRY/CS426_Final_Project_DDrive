@@ -30,13 +30,27 @@ public class HoldNote : MonoBehaviour
         {
             if(player.getAttemptHit())
             {
-                Debug.Log("hold hit");
-                accuracyManager.HoldNote();
-                player.addHit();
-                player.playHitSound();
-                gameObject.GetComponent<Renderer>().enabled = false;
-                hitStart = true;
-                canHit = false;
+                if(gameObject.tag == "HoldStart")
+                {
+                    Debug.Log("hold hit");
+                    accuracyManager.HoldNote();
+                    player.addHit();
+                    player.playHitSound();
+                    gameObject.GetComponent<Renderer>().enabled = false;
+                    Destroy(transform.parent.Find("HoldEarly").gameObject);
+                    hitStart = true;
+                    canHit = false;
+                }
+                else if (gameObject.tag == "HoldEarly")
+                {
+                    Debug.Log("hold hit");
+                    accuracyManager.HoldNote();
+                    player.addHalfHit();
+                    player.playHitSound();
+                    gameObject.GetComponent<Renderer>().enabled = false;
+                    hitStart = true;
+                    canHit = false;
+                }
             }
             else if (getStart() && player.getAttemptHold())
             {
@@ -64,6 +78,10 @@ public class HoldNote : MonoBehaviour
         if(gameObject.tag == "HoldStart")
         {
             SetEmissionColor(emissionColor);
+            canHit = true;
+        }
+        else if(gameObject.tag == "HoldEarly")
+        {
             canHit = true;
         }
         else if (getStart() && gameObject.tag == "HoldEnd")
