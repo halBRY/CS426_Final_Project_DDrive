@@ -1,4 +1,5 @@
-## To play: Download either the output for mouse and keyboard or controller depending on what you want to play with.
+## To play: 
+  ## Download either the output for mouse and keyboard or controller depending on what you want to play with.
 
 Project requires two packages: Player Input and Cinemachine
 
