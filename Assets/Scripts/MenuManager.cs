@@ -78,6 +78,7 @@ public class MenuManager : MonoBehaviour
     public void StartControlDemo()
     {
         ShowGameUI();
+        Player.overheadCamera.orthographicSize = 65f;
         Player.UnlockControls();
         HideAllMenu();
     }
@@ -101,6 +102,8 @@ public class MenuManager : MonoBehaviour
     public void StartGame()
     {
         ResetGameScene();
+
+        Player.overheadCamera.orthographicSize = 260f;
         
         gameStarted = true;
         trackTime.beginGame();

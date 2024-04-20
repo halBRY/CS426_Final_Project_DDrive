@@ -29,14 +29,23 @@ public class TrackTime : MonoBehaviour
 
     public bool gameStarted = false;
 
-    public float parTime = 275f;
-    public float parAccuracy = 50f;
-    public uint parScore = 2000000;
+    private float parTime = 275f;
+    private float parAccuracy = 65f;
+    private uint parScore = 2000000;
 
     public bool trackCleared = true;
 
     public Color clear;
     public Color fail;
+
+    public Slider scoreBar;
+    public Slider accurBar;
+
+    void Start()
+    {
+        scoreBar.maxValue = 3000000;
+        accurBar.maxValue = 0.75f;
+    }
 
     public void beginGame()
     {
@@ -55,6 +64,16 @@ public class TrackTime : MonoBehaviour
     
             timer.text = minutes.ToString("00") + " : " + seconds.ToString("00");
         }
+    }
+
+    public void UpdateScoreBar(uint score)
+    {
+        scoreBar.value = score;
+    }
+
+    public void UpdateAccurBar(float accur)
+    {
+        accurBar.value = accur;
     }
 
     public void endGame()

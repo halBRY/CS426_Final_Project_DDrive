@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
 {   
     //Player Objects
     public Camera camera;
+    public Camera overheadCamera;
     private CharacterController controller;
     private PlayerInput playerInput;
     public GameObject boonModel;
@@ -325,6 +326,8 @@ public class PlayerController : MonoBehaviour
 
             //speedText.text = myhits.ToString() + "/" + passedHits.ToString() + " = " + accuracy.ToString() + "\n" + newPitch.ToString() + " speed";
             speedText.text = (accuracy * 100).ToString("n2") + "%"; // round to 2 decimal places 
+            trackTime.UpdateAccurBar(accuracy);
+            trackTime.UpdateScoreBar(accuracyManager.getScore());
 
             //Reset if fall off edge
             if(gameObject.transform.position.y <= -30)
